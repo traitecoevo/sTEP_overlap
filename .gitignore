@@ -11,3 +11,11 @@
 # produced vignettes
 vignettes/*.html
 vignettes/*.pdf
+
+Vascular_Plants_rooted.dated.tre
+TryAccSpecies.txt
+genBankList.txt
+taxonomicResources
+output
+names_subset.txt
+.Rproj.user
