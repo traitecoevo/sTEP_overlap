@@ -19,3 +19,5 @@ taxonomicResources
 output
 names_subset.txt
 .Rproj.user
+species_centers.txt
+.DS_Store
