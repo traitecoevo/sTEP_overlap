@@ -9,7 +9,7 @@ source("data_manipulation_functions.R")
 
 sync.species.lists<-function(sampled.list){
   fread("taxonomicResources/plantList11syns.csv")%>%
-    select(correct.names)%>%
+    dplyr::select(correct.names)%>%
     mutate(correct.names=gsub("_", " ", correct.names))->goodNames
   goodNames<-data.frame(gs=unique(goodNames$correct.names),stringsAsFactors=FALSE)
   goodNames$genera<-sapply(as.character(goodNames$gs),FUN=function(x) strsplit(x," ")[[1]][1],USE.NAMES=F)
@@ -36,8 +36,8 @@ calc.proportion<-function(family.in,goodNames=goodNames){
   return(sum(fam.only$in.list)/length(fam.only$in.list))
 }
 
-read.delim("TryAccSpecies.txt",as.is=TRUE)%>%
-  select(AccSpeciesName)%>%
+fread("TryAccSpecies.txt")%>%
+  dplyr::select(AccSpeciesName)%>%
   mutate(sp=scrub(AccSpeciesName))%>%
   mutate(sp.fix=use.synonym.lookup(sp))->try.all
 try.sp<-unique(try.all$sp.fix)
@@ -52,6 +52,7 @@ fread("species_centers.txt")%>%
 goodNames<-sync.species.lists(gbif$sp)
 
 family.list<-as.list(unique(goodNames$family))
+
 test<-mclapply(family.list,FUN=test.family,goodNames=goodNames)
 
 
@@ -62,7 +63,11 @@ g<-unlist(lapply(test,function(x)x$statistic))
 p<-unlist(lapply(test,function(x)x$p.value))
 sr<-unlist(lapply(test,function(x)sum(x$observed[,2])))
 
-ranking<-data.frame(family=unique(goodNames$family),prop.sampled=prop,sr=sr,g=g,p=p,stringsAsFactors=FALSE)
+data.table(family=unique(goodNames$family),prop.sampled=prop,sr=sr,g=g,p=p,stringsAsFactors=FALSE)%>%
+  arrange(g)->ranking
+
+undersampled<-filter(ranking,prop.sampled<median(prop.sampled))
+
 write.csv(ranking,"temp.csv")
 
 
