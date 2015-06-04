@@ -5,6 +5,8 @@ library(dplyr)
 library(taxize)
 library(parallel)
 library(stargazer)
+library(raster)
+library(taxonlookup)
 source("data_manipulation_functions.R")
 
 
@@ -84,29 +86,32 @@ read.csv("")
 #   mutate(sp=use.synonym.lookup(sp))->gbif
 #goodNames<-sync.species.lists(gbif$sp)
 
-genbank<-read.genBank()
-oceania<-process.endemic.list(known.oceania)
-oceania.try<-prepare.sampling.df(sampled.list = try.sp,ref.list = oceania)
-aussie.try<-prepare.sampling.df(sampled.list = try.sp,ref.list = aussie)
-ocenaia.genbank<-prepare.sampling.df(sampled.list=genbank,ref.list=oceania)
-#goodNames<-sync.species.lists(try.sp)
+# genbank<-read.genBank()
+# oceania<-process.endemic.list(known.oceania)
+# oceania.try<-prepare.sampling.df(sampled.list = try.sp,ref.list = oceania)
+# aussie.try<-prepare.sampling.df(sampled.list = try.sp,ref.list = aussie)
+# ocenaia.genbank<-prepare.sampling.df(sampled.list=genbank,ref.list=oceania)
+goodNames<-sync.species.lists(try.sp)
 
 oceania.try<-filter(oceania.try,!is.na(family))
-family.list<-as.list(unique(oceania.try$family))
-test<-lapply(family.list,FUN=test.family,goodNames=ocenaia.genbank)
+family.list<-as.list(unique(goodNames$family))
+test<-lapply(family.list,FUN=test.family,goodNames=goodNames)
 
-prop<-unlist(lapply(family.list,FUN=calc.proportion,goodNames=aussie.try))
+
 #sr<-summarize(group_by(goodNames,family),length(gs))
 g<-unlist(lapply(test,function(x)x$statistic))
 p<-unlist(lapply(test,function(x)x$p.value))
+prop<-unlist(lapply(test,function(x)x$observed[2,2]/sum(x$observed[,2])))
 sr<-unlist(lapply(test,function(x)sum(x$observed[,2])))
 
-a<-test.family("Euphorbiaceae",ocenaia.genbank)
+a<-test.family("Euphorbiaceae",goodNames)
 calc.proportion("Euphorbiaceae",ocenaia.genbank)
 
-#NOT WORKING NOW
+
 data.table(family=unlist(family.list),prop.sampled=prop,sr=sr,g=g,p=p)%>%
   arrange(g)->ranking
+
+
 
 mean(ranking$prop.sampled,na.rm=T)
 

@@ -18,7 +18,7 @@ genbank2<-unique(genbank.2$V3)
 
 # this is the species list from try
 read.delim("TryAccSpecies.txt",as.is=TRUE)%>%
-  select(AccSpeciesName)%>%
+  dplyr::select(AccSpeciesName)%>%
   mutate(sp=scrub(AccSpeciesName))%>%
   mutate(sp.fix=use.synonym.lookup(sp))->try.all
 try.sp<-unique(try.all$sp.fix)
