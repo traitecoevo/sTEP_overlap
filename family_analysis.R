@@ -1,12 +1,11 @@
 library(data.table)
-library(TaxonLookup)
+library(taxonlookup)
 library(Deducer)
 library(dplyr)
 library(taxize)
 library(parallel)
 library(stargazer)
 library(raster)
-library(taxonlookup)
 source("data_manipulation_functions.R")
 
 

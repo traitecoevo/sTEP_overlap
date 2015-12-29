@@ -1,0 +1,21 @@
+packages:
+  - callr
+  - raster
+  - data.table
+
+sources:
+  - R
+
+targets:
+  all:
+    depends:
+      - ms.pdf
+
+  ms.pdf:
+    command: latex_build_clean("ms.tex", "refs.bib")
+    depends:
+      - figures
+
+  figures:
+    depends:
+      - figures/sampling_in_try_by_family.pdf
