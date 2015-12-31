@@ -19,14 +19,23 @@ get_cont_raster<-function(){
   writeRaster(cont.raster,"cont2.5.grd")
 }
 
-
-plot_gbif_bins<-function(){
+get_gbif<-function(){
   if (Sys.info()[[1]]=="Linux") a<-fread("../../../srv/scratch/z3484779/gbif/gbif_clean.txt")
-  else a<-fread("occur.csv")
-  worldclim10<-getData('worldclim', var='tmean', res=10)
+else a<-fread("occur.csv")
+return(a)
+}
+
+get_genbank<-function(){
   genbank<-read.csv("genBankList.txt",header=FALSE,as.is=TRUE)
   genbank.scrubbed<-scrub(genbank$V1)
+  out<-genbank.scrubbed[!is.na(genbank.scrubbed)]
+  return(out)
+}
+
+make_sampling_map(a){
+  genbank.scrubbed<-get_genbank()
   a$genbank.yes.no<-a$species%in%genbank.scrubbed
+  worldclim10<-getData('worldclim', var='tmean', res=10)
   sp<-SpatialPoints(cbind(as.numeric(a$decimalLongitude),as.numeric(a$decimalLatitude)))
   sp<-SpatialPointsDataFrame(coords=sp,data=data.frame(ing=a$genbank.yes.no))
   genbank.sampling.map<-rasterize(sp,worldclim10,field="ing",fun=mean)
@@ -34,8 +43,15 @@ plot_gbif_bins<-function(){
   plot(genbank.sampling.map,col=brewer.pal(9,"Blues"),main="Proportion of GBIF observations that are in GenBank")
   #plot(cont.shp,add=TRUE,lwd = 0.3)
   dev.off()
+}
+
+
+plot_gbif_bins<-function(){
+  a<-get_gbif()
   png("figures/genbank_binning.png")
-  ggplot(a, aes(x=decimalLatitude,y=genbank.yes.no))+geom_point()+stat_quantile()
+  print(
+    ggplot(a, aes(x=decimalLatitude,y=genbank.yes.no))+geom_point()+stat_smooth()
+  )
   dev.off()
 }
 
