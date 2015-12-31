@@ -4,6 +4,7 @@ packages:
   - data.table
   - maptools
   - readr
+  - RColorBrewer
 
 sources:
   - R
