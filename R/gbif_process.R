@@ -48,6 +48,8 @@ make_sampling_map(a){
 
 plot_gbif_bins<-function(){
   a<-get_gbif()
+  genbank.scrubbed<-get_genbank()
+  a$genbank.yes.no<-a$species%in%genbank.scrubbed
   png("figures/genbank_binning.png")
   print(
     ggplot(a, aes(x=decimalLatitude,y=genbank.yes.no))+geom_point()+stat_smooth()
