@@ -5,6 +5,7 @@ packages:
   - maptools
   - readr
   - RColorBrewer
+  - ggplot2
 
 sources:
   - R
@@ -14,7 +15,7 @@ targets:
     depends:
       - ms.pdf
       - cont2.5.grd
-      - figures/genbank.pdf
+      - figures/genbank_binning.png
 
   ms.pdf:
     command: latex_build_clean("ms.tex", "refs.bib")

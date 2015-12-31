@@ -34,7 +34,7 @@ plot_gbif_bins<-function(){
   plot(genbank.sampling.map,col=brewer.pal(9,"Blues"),main="Proportion of GBIF observations that are in GenBank")
   #plot(cont.shp,add=TRUE,lwd = 0.3)
   dev.off()
-  pdf("figures/genbank_binning.pdf")
+  png("figures/genbank_binning.png")
   ggplot(a, aes(x=decimalLatitude,y=genbank.yes.no))+geom_point()+stat_quantile()
   dev.off()
 }
