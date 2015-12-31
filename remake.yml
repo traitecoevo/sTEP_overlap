@@ -2,6 +2,7 @@ packages:
   - callr
   - raster
   - data.table
+  - maptools
 
 sources:
   - R
@@ -10,11 +11,15 @@ targets:
   all:
     depends:
       - ms.pdf
+      - cont2.5.grd
 
   ms.pdf:
     command: latex_build_clean("ms.tex", "refs.bib")
     depends:
       - figures
+  
+  cont2.5.grd:
+    command: get_cont_raster()
 
   figures:
     depends:

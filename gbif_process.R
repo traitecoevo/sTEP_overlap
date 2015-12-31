@@ -1,13 +1,14 @@
-library(data.table)
+
 
 get_cont_raster<-function(){
   library(sp) #Load your libraries
   library(maptools)
   library(raster)
   #Download the continents shapefile
-  download.file("http://baruch.cuny.edu/geoportal/data/esri/world/continent.zip",
+  download.file("http://faculty.baruch.cuny.edu/geoportal/data/esri/world/continent.zip",
                 "cont.zip")
-  #Unzip it
+  
+    #Unzip it
   unzip("cont.zip")
   #Load it
   cont.shp <- readShapeSpatial("continent.shp")
