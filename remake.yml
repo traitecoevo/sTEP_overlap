@@ -3,6 +3,7 @@ packages:
   - raster
   - data.table
   - maptools
+  - readr
 
 sources:
   - R
@@ -29,5 +30,5 @@ targets:
   gbif:
     command: load.gbif()
   
-  figures/temp_fig.pdf:
-    command: plot_gbif(gbif)
+  figures/genbank.pdf:
+    command: plot_gbif_bins(gbif)

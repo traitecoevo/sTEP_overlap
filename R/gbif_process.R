@@ -32,6 +32,20 @@ plot_gbif<-function(g){
   dev.off()
 }
 
+plot_gbif_bins<-function(a){
+a$yes.no<-rbinom(dim(a)[1],prob=0.5,1)
+sp<-SpatialPoints(cbind(as.numeric(a$decimalLongitude),as.numeric(a$decimalLatitude)))
+sp<-SpatialPointsDataFrame(coords=sp,data=data.frame(ing=a$yes.no))
+genbank.sampling.map<-rasterize(sp,worldclim10,field="ing",fun=mean)
+pdf("figures/genbank.pdf")
+plot(genbank.sampling.map,col=brewer.pal(9,"Blues"),main="Proportion of GBIF observations that are in GenBank")
+#plot(cont.shp,add=TRUE,lwd = 0.3)
+dev.off()
+}
+
+
+
+
 
 other_stuff<-function(){
 #get_cont_raster()
