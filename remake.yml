@@ -6,6 +6,8 @@ packages:
   - readr
   - RColorBrewer
   - ggplot2
+  - mgcv
+  - snow
 
 sources:
   - R
@@ -15,7 +17,7 @@ targets:
     depends:
       - ms.pdf
       - cont2.5.grd
-      - figures/genbank_binning.png
+      - figures/gam.pdf
 
   ms.pdf:
     command: latex_build_clean("ms.tex", "refs.bib")
@@ -28,7 +30,7 @@ targets:
   figures:
     depends:
       - figures/sampling_in_try_by_family.pdf
-      - figures/genbank_binning.png
+      - figures/gam.pdf
   
-  figures/genbank_binning.png:
+  figures/gam.pdf:
     command: plot_gbif_bins()

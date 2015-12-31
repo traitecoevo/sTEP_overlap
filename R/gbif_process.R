@@ -50,10 +50,10 @@ plot_gbif_bins<-function(){
   a<-get_gbif()
   genbank.scrubbed<-get_genbank()
   a$genbank.yes.no<-a$species%in%genbank.scrubbed
-  png("figures/genbank_binning.png")
-  print(
-    ggplot(a, aes(x=decimalLatitude,y=genbank.yes.no))+geom_point()+stat_smooth()
-  )
+  ou<-makeCluster(15,type="SOCK")
+  out<-bam(genbank.yes.no~decimalLatitude,family=binomial(),data=a,cluster=ou,gc.level=1)
+  pdf("figures/gam.pdf")
+  plot(out)
   dev.off()
 }
 
