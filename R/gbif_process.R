@@ -24,13 +24,18 @@ plot_gbif_bins<-function(){
   if (Sys.info()[[1]]=="Linux") a<-fread("../../../srv/scratch/z3484779/gbif/gbif_clean.txt")
   else a<-fread("occur.csv")
   worldclim10<-getData('worldclim', var='tmean', res=10)
-  a$yes.no<-rbinom(dim(a)[1],prob=0.5,1)
+  genbank<-read.csv("genBankList.txt",header=FALSE,as.is=TRUE)
+  genbank.scrubbed<-scrub(genbank$V1)
+  a$genbank.yes.no<-a$species%in%genbank.scrubbed
   sp<-SpatialPoints(cbind(as.numeric(a$decimalLongitude),as.numeric(a$decimalLatitude)))
-  sp<-SpatialPointsDataFrame(coords=sp,data=data.frame(ing=a$yes.no))
+  sp<-SpatialPointsDataFrame(coords=sp,data=data.frame(ing=a$genbank.yes.no))
   genbank.sampling.map<-rasterize(sp,worldclim10,field="ing",fun=mean)
   pdf("figures/genbank.pdf")
   plot(genbank.sampling.map,col=brewer.pal(9,"Blues"),main="Proportion of GBIF observations that are in GenBank")
   #plot(cont.shp,add=TRUE,lwd = 0.3)
+  dev.off()
+  pdf("figures/genbank_binning.pdf")
+  ggplot(a, aes(x=decimalLatitude,y=genbank.yes.no))+geom_point()+stat_quantile()
   dev.off()
 }
 
