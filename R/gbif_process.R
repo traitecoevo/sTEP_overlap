@@ -32,7 +32,7 @@ get_genbank<-function(){
   return(out)
 }
 
-make_sampling_map(a){
+make_sampling_map<-function(a){
   genbank.scrubbed<-get_genbank()
   a$genbank.yes.no<-a$species%in%genbank.scrubbed
   worldclim10<-getData('worldclim', var='tmean', res=10)
