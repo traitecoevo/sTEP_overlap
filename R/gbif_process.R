@@ -18,19 +18,29 @@ get_cont_raster<-function(){
   cont.raster<-rasterize(cont.shp,worldclim,field="CONTINENT")
   writeRaster(cont.raster,"cont2.5.grd")
 }
-library(dplyr)
 
 
+load.gbif<-function(){
 a<-fread("occur.csv")
+return(a)
+}
+
+
+other_stuff<-function(){
 #get_cont_raster()
 cont<-raster("cont2.5.grd")
 #a<-filter(a,!is.na(as.numeric(decimalLongitude)))
 a$in.genbank<-a$species%in%genbank
 a$in.try<-a$species%in%try.sp
+
+
 sp<-SpatialPoints(cbind(as.numeric(a$decimalLongitude),as.numeric(a$decimalLatitude)))
 sp<-SpatialPointsDataFrame(coords=sp,data=data.frame(ing=a$in.genbank,int=a$in.try))
 genbank.sampling.map<-rasterize(sp,worldclim10,field="ing",fun=mean)
 try.sampling.map<-rasterize(sp,worldclim10,field="int",fun=mean)
+
+
+
 pdf("genbank.pdf")
 plot(genbank.sampling.map,col=brewer.pal(9,"Blues"),main="Proportion of GBIF observations that are in GenBank")
 #plot(cont.shp,add=TRUE,lwd = 0.3)
@@ -60,3 +70,4 @@ filter(one.cont.list,cont==4)%>%
 
 filter(one.cont.list,cont==7)%>%
   dplyr::select(species)->known.oceania
+}
