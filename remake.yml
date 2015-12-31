@@ -27,9 +27,6 @@ targets:
     depends:
       - figures/sampling_in_try_by_family.pdf
       - figures/temp_fig.pdf
-      
-  gbif:
-    command: load.gbif()
   
   figures/genbank.pdf:
-    command: plot_gbif_bins(gbif)
+    command: plot_gbif_bins()

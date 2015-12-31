@@ -20,19 +20,10 @@ get_cont_raster<-function(){
 }
 
 
-load.gbif<-function(){
+plot_gbif_bins<-function(){
   if (Sys.info()[[1]]=="Linux") a<-fread("../../../srv/scratch/z3484779/gbif/gbif_clean.txt")
   else a<-fread("occur.csv")
-return(a)
-}
-
-plot_gbif<-function(g){
-  pdf("figures/temp_fig.pdf")
-  plot(g$decimalLatitude~g$decimalLongitude,pch=16)
-  dev.off()
-}
-
-plot_gbif_bins<-function(a){
+  worldclim10<-getData('worldclim', var='tmean', res=10)
 a$yes.no<-rbinom(dim(a)[1],prob=0.5,1)
 sp<-SpatialPoints(cbind(as.numeric(a$decimalLongitude),as.numeric(a$decimalLatitude)))
 sp<-SpatialPointsDataFrame(coords=sp,data=data.frame(ing=a$yes.no))
