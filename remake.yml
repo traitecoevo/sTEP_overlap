@@ -24,3 +24,10 @@ targets:
   figures:
     depends:
       - figures/sampling_in_try_by_family.pdf
+      - figures/temp_fig.pdf
+      
+  gbif:
+    command: load.gbif()
+  
+  figures/temp_fig.pdf:
+    command: plot_gbif(gbif)

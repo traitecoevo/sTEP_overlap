@@ -21,8 +21,15 @@ get_cont_raster<-function(){
 
 
 load.gbif<-function(){
-a<-fread("occur.csv")
+  if (Sys.info()[[1]]=="Linux") a<-fread("../../../srv/scratch/z3484779/gbif/gbif_clean.txt")
+  else a<-fread("occur.csv")
 return(a)
+}
+
+plot_gbif<-function(g){
+  pdf("figures/temp_fig.pdf")
+  plot(g$decimalLatitude~g$decimalLongitude,pch=16)
+  dev.off()
 }
 
 
@@ -38,8 +45,6 @@ sp<-SpatialPoints(cbind(as.numeric(a$decimalLongitude),as.numeric(a$decimalLatit
 sp<-SpatialPointsDataFrame(coords=sp,data=data.frame(ing=a$in.genbank,int=a$in.try))
 genbank.sampling.map<-rasterize(sp,worldclim10,field="ing",fun=mean)
 try.sampling.map<-rasterize(sp,worldclim10,field="int",fun=mean)
-
-
 
 pdf("genbank.pdf")
 plot(genbank.sampling.map,col=brewer.pal(9,"Blues"),main="Proportion of GBIF observations that are in GenBank")

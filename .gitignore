@@ -1,6 +1,13 @@
 # History files
 .Rhistory
 .Rapp.history
+ms.aux
+ms.bbl
+ms.blg
+ms.log
+ms.out
+ms.pdf
+.remake/
 
 # Example code in package build process
 *-Ex.R
