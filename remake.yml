@@ -13,6 +13,7 @@ targets:
     depends:
       - ms.pdf
       - cont2.5.grd
+      - figures/genbank.pdf
 
   ms.pdf:
     command: latex_build_clean("ms.tex", "refs.bib")
