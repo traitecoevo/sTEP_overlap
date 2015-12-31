@@ -30,5 +30,5 @@ targets:
       - figures/sampling_in_try_by_family.pdf
       - figures/genbank.pdf
   
-  figures/genbank.pdf:
+  figures/genbank_binning.png:
     command: plot_gbif_bins()

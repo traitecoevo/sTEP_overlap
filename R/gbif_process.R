@@ -35,7 +35,7 @@ plot_gbif_bins<-function(){
   #plot(cont.shp,add=TRUE,lwd = 0.3)
   dev.off()
   png("figures/genbank_binning.png")
-  ggplot(a, aes(x=decimalLatitude,y=genbank.yes.no))+geom_point()+stat_quantile()
+  ggplot(a, aes(x=decimalLatitude,y=genbank.yes.no))+geom_point()+stat_smooth()
   dev.off()
 }
 
