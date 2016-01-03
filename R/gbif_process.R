@@ -19,8 +19,18 @@ get_cont_raster<-function(){
   writeRaster(cont.raster,"cont2.5.grd")
 }
 
+gbif_tpl<-function(gbif){
+  syns<-fread("../../../srv/scratch/z3484779/taxonomicResources/plantList11syns.csv")
+  syns$correct.names<-sub("_"," ",syns$correct.names)
+  syns$all.names<-sub("_"," ",syns$all.names)
+  gbif$corrected.name<-syns$correct.names[match(gbif$species,syns$all.names)]
+  gbif<-filter(gbif,!is.na(corrected.name))
+  gbif<-select(gbif,species=species,lat=decimalLatitude,long=decimalLongitude)
+  return(gbif)
+  }
+
 get_gbif<-function(){
-  if (Sys.info()[[1]]=="Linux") a<-fread("../../../srv/scratch/z3484779/gbif/gbif_clean.txt")
+  if (Sys.info()[[1]]=="Linux") a<-fread("../../../srv/scratch/z3484779/gbif/gbif_cleaner.csv")
 else a<-fread("occur.csv")
 return(a)
 }
@@ -48,19 +58,50 @@ make_sampling_map<-function(a){
 
 plot_gbif_bins<-function(){
   a<-get_gbif()
+  b<-a[sample(1:dim(a)[1],5*10^5,replace=F),]
+  #b$sp.scrubbed<-scrub(b$species)
+  #bb<-filter(b,!is.na(sp.scrubbed))
   genbank.scrubbed<-get_genbank()
-  a$genbank.yes.no<-a$species%in%genbank.scrubbed
-  ou<-makeCluster(15,type="SOCK")
-  out<-bam(genbank.yes.no~decimalLatitude,family=binomial(),data=a,cluster=ou,gc.level=1)
-  pdf("figures/gam.pdf")
-  plot(out)
+  b$genbank.yes.no<-b$species%in%genbank.scrubbed
+  ou<-makeCluster(10,type="SOCK")
+  gam.genbank<-bam(genbank.yes.no~s(lat),family=binomial(),data=b,cluster=ou,gc.level=2)
+  try_sp<-read.delim("TryAccSpecies.txt")
+  try_sp$sp_scrubb<-scrub(try_sp$AccSpeciesName)
+  b$try.yes.no<-b$species%in%try_sp$sp_scrubb
+  out_try<-bam(try.yes.no~s(lat),family=binomial(),data=b,cluster=ou,gc.level=2)
+  gam.df.obs<-data.frame(lat=c(b$lat,b$lat),fit=c(fitted(out_try),fitted(gam.genbank)),dataset=c(rep("TRY",length(b$lat)),rep("genbank",length(b$lat))),type="obs")
+  
+  b<-summarize(group_by(a,species),lat=mean(lat))
+  genbank.scrubbed<-get_genbank()
+  b$genbank.yes.no<-b$species%in%genbank.scrubbed
+  ou<-makeCluster(10,type="SOCK")
+  gam.genbank<-bam(genbank.yes.no~s(lat),family=binomial(),data=b,cluster=ou,gc.level=2)
+  try_sp<-read.delim("TryAccSpecies.txt")
+  try_sp$sp_scrubb<-scrub(try_sp$AccSpeciesName)
+  b$try.yes.no<-b$species%in%try_sp$sp_scrubb
+  out_try<-bam(try.yes.no~s(lat),family=binomial(),data=b,cluster=ou,gc.level=2)
+  gam.df.sp<-data.frame(lat=c(b$lat,b$lat),fit=c(fitted(out_try),fitted(gam.genbank)),dataset=c(rep("TRY",length(b$lat)),rep("genbank",length(b$lat))),type="sp")
+  
+  out<-rbind(gam.df.obs,gam.df.sp)
+  
+  
+  png("figures/multi_gam.png")
+  print(ggplot(out,aes(x=lat,y=fit))+geom_point(aes(col=dataset)))
+  dev.off()
+}
+
+mean_gbif<-function(a){
+  
+  png("figures/multi_gam_species_based.png")
+  print(ggplot(gam.df,aes(x=lat,y=fit))+geom_point(aes(col=dataset)))
   dev.off()
 }
 
 
+
 add_continent<-function(){
   #NOT WORKING YET
-  if (Sys.info()[[1]]=="Linux") a<-fread("../../../srv/scratch/z3484779/gbif/gbif_clean.txt")
+  if (Sys.info()[[1]]=="Linux") a<-fread("../../../srv/scratch/z3484779/gbif/gbif_cleaner.csv")
 else a<-fread("occur.csv")
 cont.x<-extract(cont,sp)
 a$cont<-cont.x
