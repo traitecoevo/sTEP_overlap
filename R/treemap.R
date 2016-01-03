@@ -1,6 +1,6 @@
 
-library(treemap)
 
+make_treemap<-function(){
 
 ranking$group<-plant_lookup()$group[match(ranking$family,plant_lookup()$family)]
 ranking$order<-plant_lookup()$order[match(ranking$family,plant_lookup()$family)]
@@ -16,4 +16,4 @@ treemap(ranking,
         palette=brewer.pal(9,"Greens"),
         range=c(0,1))
 dev.off()
-
+}
