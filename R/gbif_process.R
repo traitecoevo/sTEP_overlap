@@ -25,7 +25,7 @@ gbif_tpl<-function(gbif){
   syns$all.names<-sub("_"," ",syns$all.names)
   gbif$corrected.name<-syns$correct.names[match(gbif$species,syns$all.names)]
   gbif<-filter(gbif,!is.na(corrected.name))
-  gbif<-select(gbif,species=species,lat=decimalLatitude,long=decimalLongitude)
+  gbif<-select(gbif,species=corrected.name,lat=decimalLatitude,long=decimalLongitude)
   return(gbif)
 }
 
@@ -60,11 +60,12 @@ do.gam.analysis<-function(b,type){
   b$genbank.yes.no<-b$species%in%genbank.scrubbed
   ou<-makeCluster(10,type="SOCK")
   gam.genbank<-bam(genbank.yes.no~s(lat),family=binomial(),data=b,cluster=ou,gc.level=2)
-  try_sp<-read.delim("TryAccSpecies.txt")
+  try_sp<-read.delim("TryAccSpecies.txt",as.is=TRUE)
   try_sp$sp_scrubb<-scrub(try_sp$AccSpeciesName)
   b$try.yes.no<-b$species%in%try_sp$sp_scrubb
   out_try<-bam(try.yes.no~s(lat),family=binomial(),data=b,cluster=ou,gc.level=2)
   gam.df<-data.frame(lat=c(b$lat,b$lat),fit=c(fitted(out_try),fitted(gam.genbank)),dataset=c(rep("TRY",length(b$lat)),rep("genbank",length(b$lat))),type=type)
+  stopCluster(ou)
   return(gam.df)
 }
 
@@ -84,7 +85,8 @@ plot_gbif_bins<-function(){
   
   
   png("figures/multi_gam.png")
-  print(ggplot(out,aes(x=lat,y=fit),ylab("Proportion in database"))+
+  print(ggplot(out,aes(x=lat,y=fit))+
+          ylab("Proportion in database")+
           geom_line(aes(col=dataset,linetype=type))+
         theme_classic())
   dev.off()

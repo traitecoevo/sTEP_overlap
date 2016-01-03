@@ -8,6 +8,7 @@ packages:
   - ggplot2
   - mgcv
   - snow
+  - dplyr
 
 sources:
   - R
