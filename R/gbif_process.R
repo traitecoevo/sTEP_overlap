@@ -148,10 +148,14 @@ mean_gbif<-function(a){
 
 add_continent<-function(){
   #NOT WORKING YET
+  cont<-raster("cont2.5.grd")
   if (Sys.info()[[1]]=="Linux") a<-fread("../../../srv/scratch/z3484779/gbif/gbif_cleaner.csv")
   else a<-fread("occur.csv")
+  sp<-SpatialPoints(cbind(as.numeric(a$long),as.numeric(a$lat)))
   cont.x<-extract(cont,sp)
   a$cont<-cont.x
+  write_csv(a,"../../../srv/scratch/z3484779/gbif/gbif_cleaner_geo_data.csv")
+  return(table(a$cont))
 }
 
 other_stuff<-function(){
@@ -181,7 +185,10 @@ other_stuff<-function(){
   
   cont.x<-extract(cont,sp)
   a$cont<-cont.x
+}
   
+get_endemics<-function(){
+  a<-read_csv("../../../srv/scratch/z3484779/gbif/gbif_cleaner_geo_data.csv")
   endemic<-summarize(group_by(a,species),num.cont=length(unique(cont)))
   table(endemic$num.cont)
   one.cont.endemics<-filter(endemic,num.cont==1)
@@ -196,4 +203,20 @@ other_stuff<-function(){
   
   filter(one.cont.list,cont==7)%>%
     dplyr::select(species)->known.oceania
+  write_csv(one.cont.list,"one_cont_list.csv")
 }
+
+check_endemics<-function(){
+  one.cont.list<-read_csv("one_cont_list.csv")
+  genbank.scrubbed<-get_genbank()
+  one.cont.list$one.cont.list.genbank.yes.no<-one.cont.list$species%in%genbank.scrubbed
+  tt<-table(one.cont.list$cont,one.cont.list$one.cont.list.yes.no)
+  tt[,2]/(tt[,1]+tt[,2])
+  try_sp<-read.delim("TryAccSpecies.txt",as.is=TRUE)
+  try_sp$sp_scrubb<-scrub(try_sp$AccSpeciesName)
+  one.cont.list$try.yes.no<-one.cont.list$species%in%try_sp$sp_scrubb
+  tt<-table(one.cont.list$cont,one.cont.list$try.yes.no)
+  tt[,2]/(tt[,1]+tt[,2])
+  write_csv(one.cont.list,"one_cont_list.csv")
+}
+
