@@ -62,11 +62,12 @@ zae.diaz.analysis<-function(b,type){
   ou<-makeCluster(10,type="SOCK")
   gam.genbank<-bam(genbank.yes.no~s(lat),family=binomial(),data=b,cluster=ou,gc.level=2)
   try_sp<-read.delim("TryAccSpecies.txt",as.is=TRUE)
-  try_super<-try_sp$AccSpeciesName[which(try_sp$TraitNum>100)]
+  try_super<-try_sp$AccSpeciesName[which(try_sp$TraitNum>5)]
   ts<-scrub(try_super)
   b$try.yes.no<-b$species%in%ts
   out_try<-bam(try.yes.no~s(lat),family=binomial(),data=b,cluster=ou,gc.level=2)
-  gam.df<-data.frame(lat=c(b$lat,b$lat),fit=c(fitted(out_try),fitted(gam.genbank)),dataset=c(rep("TRY",length(b$lat)),rep("genbank",length(b$lat))),type=type)
+  
+  gam.df<-data.frame(lat=c(b$lat,b$lat),fit=c(fitted(out_try),fitted(gam.genbank)),dataset=c(rep("Well sampled TRY",length(b$lat)),rep("Zanne",length(b$lat))),type=type)
   stopCluster(ou)
   return(gam.df)
 }
@@ -80,7 +81,7 @@ do.gam.analysis<-function(b,type){
   try_sp$sp_scrubb<-scrub(try_sp$AccSpeciesName)
   b$try.yes.no<-b$species%in%try_sp$sp_scrubb
   out_try<-bam(try.yes.no~s(lat),family=binomial(),data=b,cluster=ou,gc.level=2)
-  gam.df<-data.frame(lat=c(b$lat,b$lat),fit=c(fitted(out_try),fitted(gam.genbank)),dataset=c(rep("Well sampled TRY",length(b$lat)),rep("Zanne",length(b$lat))),type=type)
+  gam.df<-data.frame(lat=c(b$lat,b$lat),fit=c(fitted(out_try),fitted(gam.genbank)),dataset=c(rep("TRY",length(b$lat)),rep("genbank",length(b$lat))),type=type)
   stopCluster(ou)
   return(gam.df)
 }
@@ -95,6 +96,8 @@ plot_gbif_bins<-function(){
   
   #do the gam on species dataset
   by.species<-summarize(group_by(a,species),lat=median(lat))
+  rm(a)
+  gc()
   gam.df.sp<-do.gam.analysis(by.species,type="by species")
  
   out<-rbind(gam.df.obs,gam.df.sp)
@@ -118,6 +121,8 @@ plot_gbif_bins_zae_diaz<-function(){
   
   #do the gam on species dataset
   by.species<-summarize(group_by(a,species),lat=median(lat))
+  rm(a)
+  gc()
   gam.df.sp<-zae.diaz.analysis(by.species,type="by species")
   
   out<-rbind(gam.df.obs,gam.df.sp)
