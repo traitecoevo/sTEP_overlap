@@ -19,6 +19,7 @@ targets:
       - ms.pdf
       - cont2.5.grd
       - figures/multi_gam.png
+      - figures/multi_gam_zae_diaz.png
 
   ms.pdf:
     command: latex_build_clean("ms.tex", "refs.bib")
@@ -31,7 +32,11 @@ targets:
   figures:
     depends:
       - figures/sampling_in_try_by_family.pdf
+      - figures/multi_gam_zae_diaz.png
       - figures/gam.pdf
   
   figures/multi_gam.png:
     command: plot_gbif_bins()
+    
+  figures/multi_gam_zae_diaz.png:
+    command: plot_gbif_bins_zae_diaz()

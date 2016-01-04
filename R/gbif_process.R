@@ -55,6 +55,22 @@ make_sampling_map<-function(a){
   dev.off()
 }
 
+zae.diaz.analysis<-function(b,type){
+  zae<-read.tree("Vascular_Plants_rooted.dated.tre")
+  z<-scrub(zae$tip.label)
+  b$genbank.yes.no<-b$species%in%z
+  ou<-makeCluster(10,type="SOCK")
+  gam.genbank<-bam(genbank.yes.no~s(lat),family=binomial(),data=b,cluster=ou,gc.level=2)
+  try_sp<-read.delim("TryAccSpecies.txt",as.is=TRUE)
+  try_super<-try_sp$AccSpeciesName[which(try_sp$TraitNum>100)]
+  ts<-scrub(try_super)
+  b$try.yes.no<-b$species%in%ts
+  out_try<-bam(try.yes.no~s(lat),family=binomial(),data=b,cluster=ou,gc.level=2)
+  gam.df<-data.frame(lat=c(b$lat,b$lat),fit=c(fitted(out_try),fitted(gam.genbank)),dataset=c(rep("TRY",length(b$lat)),rep("genbank",length(b$lat))),type=type)
+  stopCluster(ou)
+  return(gam.df)
+}
+
 do.gam.analysis<-function(b,type){
   genbank.scrubbed<-get_genbank()
   b$genbank.yes.no<-b$species%in%genbank.scrubbed
@@ -64,7 +80,7 @@ do.gam.analysis<-function(b,type){
   try_sp$sp_scrubb<-scrub(try_sp$AccSpeciesName)
   b$try.yes.no<-b$species%in%try_sp$sp_scrubb
   out_try<-bam(try.yes.no~s(lat),family=binomial(),data=b,cluster=ou,gc.level=2)
-  gam.df<-data.frame(lat=c(b$lat,b$lat),fit=c(fitted(out_try),fitted(gam.genbank)),dataset=c(rep("TRY",length(b$lat)),rep("genbank",length(b$lat))),type=type)
+  gam.df<-data.frame(lat=c(b$lat,b$lat),fit=c(fitted(out_try),fitted(gam.genbank)),dataset=c(rep("Well sampled TRY",length(b$lat)),rep("Zanne",length(b$lat))),type=type)
   stopCluster(ou)
   return(gam.df)
 }
@@ -78,7 +94,7 @@ plot_gbif_bins<-function(){
   gam.df.obs<-do.gam.analysis(random.obs,type="by gbif observation")
   
   #do the gam on species dataset
-  by.species<-summarize(group_by(a,species),lat=mean(lat))
+  by.species<-summarize(group_by(a,species),lat=median(lat))
   gam.df.sp<-do.gam.analysis(by.species,type="by species")
  
   out<-rbind(gam.df.obs,gam.df.sp)
@@ -91,6 +107,30 @@ plot_gbif_bins<-function(){
         theme_classic())
   dev.off()
 }
+
+
+plot_gbif_bins_zae_diaz<-function(){
+  a<-get_gbif()
+  
+  #do the gam on a random subsample
+  random.obs<-a[sample(1:dim(a)[1],5*10^5,replace=F),]
+  gam.df.obs<-zae.diaz.analysis(random.obs,type="by gbif observation")
+  
+  #do the gam on species dataset
+  by.species<-summarize(group_by(a,species),lat=median(lat))
+  gam.df.sp<-zae.diaz.analysis(by.species,type="by species")
+  
+  out<-rbind(gam.df.obs,gam.df.sp)
+  
+  
+  png("figures/multi_gam_zae_diaz.png")
+  print(ggplot(out,aes(x=lat,y=fit))+
+          ylab("Proportion in database")+
+          geom_line(aes(col=dataset,linetype=type))+
+          theme_classic())
+  dev.off()
+}
+
 
 mean_gbif<-function(a){
   
