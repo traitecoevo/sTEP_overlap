@@ -86,7 +86,7 @@ use.synonym.lookup<-function(orig.names){
   orig.names<-sub(" ","_",orig.names)
   #names(lookup)<-c("correct.names","all.names")
   #write.csv(lookup,"taxonomicResources//plantList11syns.csv",row.names=FALSE,quote=F)
-  lookup<-read.csv("taxonomicResources//plantList11syns.csv",as.is=T)
+  lookup<-read_csv("../../../srv/scratch/z3484779/taxonomicResources//plantList11syns.csv")
   out.sp<-orig.names
   matched.spp<-lookup$correct.names[match(orig.names,lookup$all.names)]
   matched.spp<-sub("_"," ",matched.spp)
@@ -95,7 +95,7 @@ use.synonym.lookup<-function(orig.names){
   out.sp[!is.na(matched.spp)]<-matched.spp[!is.na(matched.spp)]
   df<-data.frame(new.sp=matched.spp[!is.na(matched.spp)],old.name=orig.names[!is.na(matched.spp)])
   df<-subset(df,as.character(df$new.sp)!=as.character(df$old.name))
-  write.csv(df,"output/syn_fixes_done.csv",row.names=F)
+  write_csv(df,"try_syn_fixes_done.csv")
   return(out.sp)
 }
 
