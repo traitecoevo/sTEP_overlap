@@ -144,7 +144,7 @@ read.genBank<-function(){
 # oceania.try<-prepare.sampling.df(sampled.list = try.sp,ref.list = oceania)
 # aussie.try<-prepare.sampling.df(sampled.list = try.sp,ref.list = aussie)
 # ocenaia.genbank<-prepare.sampling.df(sampled.list=genbank,ref.list=oceania)
-run_family_analysis<-function(){
+run_family_analysis<-function(goodNames){
   try.sp<-read.in.try()
   goodNames<-sync.species.lists(try.sp)
   
@@ -163,7 +163,53 @@ run_family_analysis<-function(){
   write_csv(ranking,"tables/all_families_ranking.csv")
   
 }
+
+do.endemic.analysis<-function(){
+  one<-read_csv("one_cont_list.csv")
+  one.p<-filter(one,!is.na(cont))
+  try.sp<-read.in.try()
+  genbank<-read.genBank()
   
+  
+  
+  out<-prepare.sampling.df(genbank,one.p$species[one.p$cont==1])
+  family.list<-as.list(unique(out$family))
+  test<-mclapply(family.list,FUN=test.family,goodNames=out)
+ 
+  g<-unlist(lapply(test,function(x)x$statistic))
+  p<-unlist(lapply(test,function(x)x$p.value))
+  prop<-unlist(lapply(test,function(x)x$observed[2,2]/sum(x$observed[,2])))
+  sr<-unlist(lapply(test,function(x)sum(x$observed[,2])))
+  
+  
+  data.table(family=unlist(family.list),prop.sampled=prop,sr=sr,g=g,p=p)%>%
+    arrange(g)->ranking 
+}
+
+
+## TRY
+
+# Global for TRY: Acanthaceae, Orchidaceae
+
+#North America = Dryopteridaceae
+#Australia = Lamiaceae
+#Asia = Gesneriaceae
+#Africa = Apocynaceae
+#S America = Asteraceae
+#Oceania = Rubiaceae
+#Europe = Asteraceae
+
+
+## GenBank
+
+#Europe = Asteraceae
+#Asia = Myrtaceae
+#Australia = Hypnaceae
+#North America = Myrtaceae
+#South America = Asteraceae
+#Oceania = Euphorbiaceae
+#Africa = Acanthaceae
+
 process_family_output<-function(test){
   #sr<-summarize(group_by(goodNames,family),length(gs))
   g<-unlist(lapply(test,function(x)x$statistic))
