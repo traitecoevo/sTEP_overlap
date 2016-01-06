@@ -11,6 +11,7 @@ packages:
   - dplyr
   - ape
   - parallel
+  - taxonlookup
 
 sources:
   - R
@@ -19,15 +20,12 @@ targets:
   all:
     depends:
       - ms.pdf
-      - cont2.5.grd
-      - figures/multi_gam.png
-      - figures/multi_gam_zae_diaz.png
-      - tables/all_families_ranking.csv
 
   ms.pdf:
     command: latex_build_clean("ms.tex", "refs.bib")
     depends:
       - figures
+      - tables
   
   cont2.5.grd:
     command: get_cont_raster()
@@ -36,7 +34,10 @@ targets:
     depends:
       - figures/sampling_in_try_by_family.pdf
       - figures/multi_gam_zae_diaz.png
-      - figures/gam.pdf
+
+  tables:
+    depends:
+      - tables/all_families_ranking.csv
   
   figures/multi_gam.png:
     command: plot_gbif_bins()
