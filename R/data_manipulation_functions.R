@@ -1,3 +1,4 @@
+pacman::p_load(dplyr, raster,data.table,maptools,ape,readr,ggplot2,taxonlookup, snow, parallel,mgcv)
 
 get_good_names<-function(){
   require(dplyr)
