@@ -38,6 +38,7 @@ targets:
   tables:
     depends:
       - tables/all_families_ranking.csv
+      - tables/summary_of_endemic_analysis.csv
   
   figures/multi_gam.png:
     command: plot_gbif_bins()
@@ -47,3 +48,6 @@ targets:
     
   tables/all_families_ranking.csv:
     command: run_family_analysis()
+    
+  tables/summary_of_endemic_analysis.csv:
+    command: do.endemic.analysis()

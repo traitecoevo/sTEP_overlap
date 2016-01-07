@@ -164,28 +164,44 @@ run_family_analysis<-function(goodNames){
   
 }
 
-do.endemic.analysis<-function(){
-  one<-read_csv("one_cont_list.csv")
+perform_endemic_analysis<-function(cont.number,db,one=one){
   one.p<-filter(one,!is.na(cont))
-  try.sp<-read.in.try()
-  genbank<-read.genBank()
+  out<-prepare.sampling.df(db,one.p$species[one.p$cont==cont.number])
   
+  if(sum(out$in.list)==0){
+    return(NA)
+  }
   
-  
-  out<-prepare.sampling.df(genbank,one.p$species[one.p$cont==1])
   family.list<-as.list(unique(out$family))
-  test<-mclapply(family.list,FUN=test.family,goodNames=out)
- 
+  test<-lapply(family.list,FUN=test.family,goodNames=out)
+  
   g<-unlist(lapply(test,function(x)x$statistic))
   p<-unlist(lapply(test,function(x)x$p.value))
   prop<-unlist(lapply(test,function(x)x$observed[2,2]/sum(x$observed[,2])))
   sr<-unlist(lapply(test,function(x)sum(x$observed[,2])))
   
-  
-  data.table(family=unlist(family.list),prop.sampled=prop,sr=sr,g=g,p=p)%>%
+  data_frame(family=unlist(family.list),prop.sampled=prop,sr=sr,g=g,p=p)%>%
     arrange(g)->ranking 
+  under<-filter(ranking,prop.sampled<0.2)
+  under<-arrange(under,desc(g))
+  return(under[1:2,])
 }
 
+do.endemic.analysis<-function(){
+  one<-read_csv("one_cont_list.csv")
+  try.sp<-read.in.try()
+  genbank<-read.genBank()
+  try_by_cont<-mclapply(as.list(unique(one$cont)),perform_endemic_analysis,db=try.sp,one=one)
+  gb_by_cont<-mclapply(as.list(unique(one$cont)),perform_endemic_analysis,db=genbank,one=one)
+  
+  helper<-c(1,1,2,2,3,4,4,5,5,6,6,7,7,8,8,9)
+  
+  
+    sum.df<-data_frame(con=rep(helper,2),family=c(lapply(try_by_cont,function(x)x[1]),lapply(gb_by_cont,function(x)x[1]),db=c(rep(("try"),16),rep("genbank",16))))
+
+    write_csv(sum.df,"tables/summary_of_endemic_analysis.csv")
+    return(sum.df)
+}
 
 ## TRY
 
