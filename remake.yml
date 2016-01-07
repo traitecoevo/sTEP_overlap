@@ -47,7 +47,7 @@ targets:
     command: plot_gbif_bins_zae_diaz()
     
   tables/all_families_ranking.csv:
-    command: run_family_analysis()
+    command: do_big_list_family_anlysis()
     
   tables/summary_of_endemic_analysis.csv:
     command: do.endemic.analysis()

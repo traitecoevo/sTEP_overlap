@@ -144,9 +144,8 @@ read.genBank<-function(){
 # oceania.try<-prepare.sampling.df(sampled.list = try.sp,ref.list = oceania)
 # aussie.try<-prepare.sampling.df(sampled.list = try.sp,ref.list = aussie)
 # ocenaia.genbank<-prepare.sampling.df(sampled.list=genbank,ref.list=oceania)
-run_family_analysis<-function(goodNames){
-  try.sp<-read.in.try()
-  goodNames<-sync.species.lists(try.sp)
+run_family_analysis<-function(db_list){
+  goodNames<-sync.species.lists(db_list)
   
   #oceania.try<-filter(oceania.try,!is.na(family))
   family.list<-as.list(unique(goodNames$family))
@@ -157,12 +156,32 @@ run_family_analysis<-function(goodNames){
   prop<-unlist(lapply(test,function(x)x$observed[2,2]/sum(x$observed[,2])))
   sr<-unlist(lapply(test,function(x)sum(x$observed[,2])))
   
-  
   data.table(family=unlist(family.list),prop.sampled=prop,sr=sr,g=g,p=p)%>%
     arrange(g)->ranking
-  write_csv(ranking,"tables/all_families_ranking.csv")
   
+  under<-filter(ranking,prop.sampled<0.2)
+  under<-arrange(under,desc(g))
+  
+  return(under[1:10,])
 }
+
+do_big_list_family_anlysis<-function(){
+  t_try<-run_family_analysis(read.in.try())
+  write_csv(t_try,"tables/try_families_ranking.csv")
+  t_gb<-run_family_analysis(read.genBank())
+  write_csv(,"tables/genbank_families_ranking.csv")
+  a<-fread("../../../srv/scratch/z3484779/gbif/gbif_cleaner.csv")
+  gb_sp<-unique(a$species)
+  rm(a)
+  gc()
+  gb_sp<-use.synonym.lookup(scrub(gb_sp))
+  t_gbif<-run_family_analysis(gb_sp)
+  write_csv(,"tables/gbif_families_ranking.csv")
+  t_all<-rbind(t_try,t_gb,t_gbif)
+  write_csv(t_all,"tables/all_families_ranking.csv")
+}
+  
+
 
 perform_endemic_analysis<-function(cont.number,db,one=one){
   one.p<-filter(one,!is.na(cont))
