@@ -39,6 +39,7 @@ targets:
     depends:
       - tables/all_families_ranking.csv
       - tables/summary_of_endemic_analysis.csv
+      - tables/two_and_three_way_comparisons.csv
   
   figures/multi_gam.png:
     command: plot_gbif_bins()
@@ -51,3 +52,6 @@ targets:
     
   tables/summary_of_endemic_analysis.csv:
     command: do.endemic.analysis()
+    
+  tables/two_and_three_way_comparisons.csv:
+    command: do_overlap_analysis()
