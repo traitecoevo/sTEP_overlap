@@ -52,7 +52,7 @@ calculate.overlap <- function(y, i){
 }
 
 
-do_overlap_analysis<-function()
+do_overlap_analysis<-function(){
 y<-list(genbank=get_genbank(),
         try.all.names=read.in.try(),
         gbif=get_gbif_names())
