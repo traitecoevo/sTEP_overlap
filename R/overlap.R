@@ -1,8 +1,8 @@
-library(dplyr)
-library(Hmisc)
-library(ape)
-library(data.table)
-source("data_manipulation_functions.R")
+# library(dplyr)
+# library(Hmisc)
+# library(ape)
+# library(data.table)
+# source("data_manipulation_functions.R")
 
 # this is the genbank species list from the NCBI Browser website
 #read.delim("genBankList.txt",header=FALSE,as.is=T)%>%
