@@ -193,11 +193,8 @@ do.endemic.analysis<-function(){
   genbank<-read.genBank()
   try_by_cont<-mclapply(as.list(unique(one$cont)),perform_endemic_analysis,db=try.sp,one=one)
   gb_by_cont<-mclapply(as.list(unique(one$cont)),perform_endemic_analysis,db=genbank,one=one)
-  
   helper<-c(1,1,2,2,3,4,4,5,5,6,6,7,7,8,8,9)
-  
-  
-    sum.df<-data_frame(con=rep(helper,2),family=c(lapply(try_by_cont,function(x)x[1]),lapply(gb_by_cont,function(x)x[1]),db=c(rep(("try"),16),rep("genbank",16))))
+    sum.df<-data_frame(con=rep(helper,2),family=c(unlist(lapply(try_by_cont,function(x)x[1])),unlist(lapply(gb_by_cont,function(x)x[1]))),db=c(rep(("try"),16),rep("genbank",16)))
 
     write_csv(sum.df,"tables/summary_of_endemic_analysis.csv")
     return(sum.df)
