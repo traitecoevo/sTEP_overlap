@@ -56,7 +56,7 @@ make_sampling_map<-function(a){
 }
 
 zae.diaz.analysis<-function(b,type){
-  zae<-read.tree("Vascular_Plants_rooted.dated.tre")
+  zae<-read.tree("zanne_tpl_1_1.tre")
   z<-scrub(zae$tip.label)
   b$genbank.yes.no<-b$species%in%z
   ou<-makeCluster(15,type="SOCK")
