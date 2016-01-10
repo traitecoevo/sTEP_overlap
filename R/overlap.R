@@ -64,18 +64,24 @@ do_overlap_analysis<-function(){
   diaz<-use.synonym.lookup(scrub(diaz))
   gbif<-get_gbif_names()
   try_names<-read.in.try()
-y<-list(
-        genbank=get_genbank()[get_genbank()%in%tpl_names],
-        try.all.names=try_names[try_names%in%tpl_names],
-        gbif=gbif[gbif%in%tpl_names],
-        zae=zae[zae%in%tpl_names],
-        diaz=diaz[diaz%in%tpl_names]
-        )
-out<-c(sapply(y,length),calculate.overlap(y,2),calculate.overlap(y,3))
-write.csv(out,"tables/two_and_three_way_comparisons.csv")
-print(xtable(data.frame(out),caption="this is a caption"),file="tables/two_and_three_way_comparisons.tex",booktabs=TRUE,floating=FALSE,caption.placement="top")
-
+  y<-list(
+    genbank=get_genbank()[get_genbank()%in%tpl_names],
+    try.all.names=try_names[try_names%in%tpl_names],
+    gbif=gbif[gbif%in%tpl_names],
+    zae=zae[zae%in%tpl_names],
+    diaz=diaz[diaz%in%tpl_names]
+  )
+  return(y)
 }
+
+write_overlap_table<-function(y){
+  out<-c(sapply(y,length),calculate.overlap(y,2),calculate.overlap(y,3))
+  write.csv(out,"tables/two_and_three_way_comparisons.csv")
+  print(xtable(data.frame(out),caption="this is a caption"),file="tables/two_and_three_way_comparisons.tex",booktabs=TRUE,floating=FALSE,caption.placement="top")
+}
+
+
+
 
 #FOR FUTURE CHECKS:
 #tree.names[!tree.names%in%genbank]

@@ -13,6 +13,7 @@ packages:
   - parallel
   - taxonlookup
   - xtable
+  - treemap
 
 sources:
   - R
@@ -36,6 +37,7 @@ targets:
       - figures/sampling_in_try_by_family.pdf
       - figures/multi_gam_zae_diaz.png
       - figures/multi_gam.png
+      - figures/treemap_genbank.pdf
 
   tables:
     depends:
@@ -54,6 +56,12 @@ targets:
     
   tables/summary_of_endemic_analysis.tex:
     command: do.endemic.analysis()
-    
-  tables/two_and_three_way_comparisons.tex:
+
+  overlap_data:
     command: do_overlap_analysis()
+
+  tables/two_and_three_way_comparisons.tex:
+    command: write_overlap_table(overlap_data)
+
+  figures/treemap_genbank.pdf:
+    command: make_treemaps(overlap_data)
