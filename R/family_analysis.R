@@ -219,6 +219,7 @@ do.endemic.analysis<-function(){
     sum.df<-data_frame(con=rep(helper,2),family=c(unlist(lapply(try_by_cont,function(x)x[1])),unlist(lapply(gb_by_cont,function(x)x[1]))),db=c(rep(("try"),16),rep("genbank",16)))
 
     write_csv(sum.df,"tables/summary_of_endemic_analysis.csv")
+  print(xtable(sum.df,caption="this is a caption"),file="tables/summary_of_endemic_analysis.tex",booktabs=TRUE,floating=FALSE,caption.placement="top")
     return(sum.df)
 }
 

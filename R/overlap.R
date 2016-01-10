@@ -59,6 +59,8 @@ y<-list(genbank=get_genbank(),
         zae=read.tree("zanne1.1.tre")$tip.labels)
 out<-c(sapply(y,length),calculate.overlap(y,2),calculate.overlap(y,3))
 write.csv(out,"tables/two_and_three_way_comparisons.csv")
+print(xtable(out,caption="this is a caption"),file="tables/two_and_three_way_comparisons.tex",booktabs=TRUE,floating=FALSE,caption.placement="top")
+
 }
 
 #FOR FUTURE CHECKS:
