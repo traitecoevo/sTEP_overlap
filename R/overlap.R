@@ -53,10 +53,12 @@ calculate.overlap <- function(y, i){
 
 
 do_overlap_analysis<-function(){
+  zae<-read.tree("zanne1.1.tre")$tip.labels
+  zae<-sub("_"," ",zae)
 y<-list(genbank=get_genbank(),
         try.all.names=read.in.try(),
         gbif=get_gbif_names(),
-        zae=read.tree("zanne1.1.tre")$tip.labels)
+        zae=zae)
 out<-c(sapply(y,length),calculate.overlap(y,2),calculate.overlap(y,3))
 write.csv(out,"tables/two_and_three_way_comparisons.csv")
 print(xtable(data.frame(out),caption="this is a caption"),file="tables/two_and_three_way_comparisons.tex",booktabs=TRUE,floating=FALSE,caption.placement="top")

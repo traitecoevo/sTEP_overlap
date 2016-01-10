@@ -57,6 +57,3 @@ targets:
     
   tables/two_and_three_way_comparisons.tex:
     command: do_overlap_analysis()
-
-  figures/multi_gam.png:
-    commang: plot_gbif_bins()
