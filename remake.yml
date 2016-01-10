@@ -12,6 +12,7 @@ packages:
   - ape
   - parallel
   - taxonlookup
+  - xtable
 
 sources:
   - R
