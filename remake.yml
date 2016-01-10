@@ -48,9 +48,11 @@ targets:
   
   figures/multi_gam.png:
     command: plot_gbif_bins()
+    check: exists
     
   figures/multi_gam_zae_diaz.png:
     command: plot_gbif_bins_zae_diaz()
+    check: exists
     
   tables/all_families_ranking.tex:
     command: do_big_list_family_anlysis()
