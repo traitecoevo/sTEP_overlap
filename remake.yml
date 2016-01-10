@@ -38,8 +38,8 @@ targets:
   tables:
     depends:
       - tables/all_families_ranking.tex
-      - tables/summary_of_endemic_analysis.csv
-      - tables/two_and_three_way_comparisons.csv
+      - tables/summary_of_endemic_analysis.tex
+      - tables/two_and_three_way_comparisons.tex
   
   figures/multi_gam.png:
     command: plot_gbif_bins()
@@ -50,8 +50,8 @@ targets:
   tables/all_families_ranking.tex:
     command: do_big_list_family_anlysis()
     
-  tables/summary_of_endemic_analysis.csv:
+  tables/summary_of_endemic_analysis.tex:
     command: do.endemic.analysis()
     
-  tables/two_and_three_way_comparisons.csv:
+  tables/two_and_three_way_comparisons.tex:
     command: do_overlap_analysis()
