@@ -55,16 +55,21 @@ calculate.overlap <- function(y, i){
 
 
 do_overlap_analysis<-function(){
-  zae<-read.tree("zanne1.1.tre")$tip.label
+  z.tree<-read.tree("zanne_tpl_1_1.tre")
+  zae<-z.tree$tip.label
   zae<-sub("_"," ",zae)
   lookup <- read_csv("../../../srv/scratch/z3484779/taxonomicResources//plantList11syns.csv")
+  tpl_names <- unique(sub("_"," ",lookup$correct.names))
   diaz<-read_csv("diaz_etal_names.csv")$name_TLP_TRY30_resolved
+  diaz<-scrub(diaz)
+  gbif<-get_gbif_names()
+  try_names<-read.in.try()
 y<-list(
-        genbank=get_genbank()[get_genbank()%in%lookup$correct.names],
-        try.all.names=read.in.try()[read.in.try()%in%lookup$correct.names],
-        gbif=get_gbif_names()[get_gbif_names()%in%lookup$correct.names],
-        zae=zae[zae%in%lookup$correct.names],
-        diaz=diaz[diaz%in%lookup$correct.names]
+        genbank=get_genbank()[get_genbank()%in%tpl_names],
+        try.all.names=try_names[try_names%in%tpl_names],
+        gbif=gbif[gbif%in%tpl_names],
+        zae=zae[zae%in%tpl_names],
+        diaz=diaz[diaz%in%tpl_names]
         )
 out<-c(sapply(y,length),calculate.overlap(y,2),calculate.overlap(y,3))
 write.csv(out,"tables/two_and_three_way_comparisons.csv")

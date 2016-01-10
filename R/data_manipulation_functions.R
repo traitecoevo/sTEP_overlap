@@ -90,13 +90,15 @@ use.synonym.lookup<-function(orig.names){
   lookup<-read_csv("../../../srv/scratch/z3484779/taxonomicResources//plantList11syns.csv")
   out.sp<-orig.names
   matched.spp<-lookup$correct.names[match(orig.names,lookup$all.names)]
-  matched.spp<-sub("_"," ",matched.spp)
-  orig.names<-sub("_"," ",orig.names)
-  out.sp<-sub("_"," ",out.sp)
+  
+  #change all the species in all.names
   out.sp[!is.na(matched.spp)]<-matched.spp[!is.na(matched.spp)]
-  df<-data.frame(new.sp=matched.spp[!is.na(matched.spp)],old.name=orig.names[!is.na(matched.spp)])
-  df<-subset(df,as.character(df$new.sp)!=as.character(df$old.name))
-  write_csv(df,"try_syn_fixes_done.csv")
+  
+  #change back all the species that are also accepted names (this is for a case where some subspecies have listed synonyms)
+  out.sp[orig.names%in%lookup$correct.names]<-orig.names[orig.names%in%lookup$correct.names]
+  
+  out.sp<-sub("_"," ",out.sp)
+
   return(out.sp)
 }
 
