@@ -7,8 +7,6 @@ make_treemaps<-function(y){
   lt<-lookup_table(out,by_species = TRUE)
   lt$species<-row.names(lt)
   
-  y.smaller[1]
-  
   for (i in 1:3){
     lt$prop.sampled<-lt$species%in%y[[i]]
     ranking<-summarize(group_by(lt,family),sr=length(species),prop.sampled=mean(prop.sampled),group=group[1])
@@ -23,8 +21,8 @@ make_treemaps<-function(y){
             vSize="sr",
             vColor="prop.sampled",
             type="manual",
-            title=sprintf(%s,names(y[i]))
-            palette=brewer.pal(9,"RdGy"),
+            title=sprintf("%s",names(y[i])),
+            palette=brewer.pal(11,"RdBu"),
             range=c(0,1))
     dev.off()
   }
