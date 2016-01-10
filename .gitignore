@@ -8,6 +8,11 @@ ms.log
 ms.out
 ms.pdf
 .remake/
+tables/*.csv
+dwarf.pbs
+one_cont_list.csv
+remake.Rout
+zanne_tpl_1_1.tre
 
 # Example code in package build process
 *-Ex.R
