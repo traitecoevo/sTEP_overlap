@@ -37,7 +37,7 @@ targets:
 
   tables:
     depends:
-      - tables/all_families_ranking.csv
+      - tables/all_families_ranking.tex
       - tables/summary_of_endemic_analysis.csv
       - tables/two_and_three_way_comparisons.csv
   
@@ -47,7 +47,7 @@ targets:
   figures/multi_gam_zae_diaz.png:
     command: plot_gbif_bins_zae_diaz()
     
-  tables/all_families_ranking.csv:
+  tables/all_families_ranking.tex:
     command: do_big_list_family_anlysis()
     
   tables/summary_of_endemic_analysis.csv:
