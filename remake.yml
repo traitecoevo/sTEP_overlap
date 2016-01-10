@@ -68,4 +68,4 @@ targets:
     command: make_treemaps(overlap_data)
 
   figures/treemap_well_known.pdf:
-    command: make_well_known_treemap
+    command: make_well_known_treemap(overlap_data)
