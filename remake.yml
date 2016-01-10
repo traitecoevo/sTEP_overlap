@@ -38,6 +38,7 @@ targets:
       - figures/multi_gam_zae_diaz.png
       - figures/multi_gam.png
       - figures/treemap_genbank.pdf
+      - figures/treemap_well_known.pdf
 
   tables:
     depends:
@@ -65,3 +66,6 @@ targets:
 
   figures/treemap_genbank.pdf:
     command: make_treemaps(overlap_data)
+
+  figures/treemap_well_known.pdf:
+    command: make_well_known_treemap
