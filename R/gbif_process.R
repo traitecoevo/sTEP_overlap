@@ -93,7 +93,7 @@ plot_gbif_bins<-function(){
   a<-get_gbif()
   
   #do the gam on a random subsample
-  random.obs<-a[sample(1:dim(a)[1],5*10^5,replace=F),]
+  random.obs<-a[sample(1:dim(a)[1],5*10^6,replace=F),]
   gam.df.obs<-do.gam.analysis(random.obs,type="by gbif observation")
   
   #do the gam on species dataset

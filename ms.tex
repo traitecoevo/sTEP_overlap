@@ -11,12 +11,14 @@
 \title{What we don't currently know about global plant functional diversity}
 \author{
 Will Cornwell$^1$
-et al.}
+Will Pearse$^2$
+Amy Zanne$^3$}
 
 \affiliation{
 *final list and order undecided\\
 $^1$ University of NSW\\
-}
+$^2$ somewhere between Wales and Canada?\\
+$^3$ global vagabond}
 \date{}
 
 \bibliographystyle{mee}
@@ -42,25 +44,31 @@ $^1$ University of NSW\\
 
 \section{Results}
 
-\subsection{Species that we know a lot about}
+\subsection{Species  that we know a lot about}
 
 Among the currently accepted 350,699 plant species in the world, there are about 1,647 that we know a lot about, spatially, genetically, and functionally--this is 0.47\% of extant diversity.  With more effort on taxonomy and synonymy that number may be a bit higher with existing data, but largely the vast majority of the missing species are  data that is yet to be collected.  There are however hot spots of knowledge: Ginkgoaceae and Welwitschiaceae are well characterised botanical oddities.  Among the families with more than 100 species, the largest of the gymnosperm families are the best characterised--Pinacae (45 out of 255 species) and Cupressaceae (15 out of 163). Betulaceae (19 out of 234) and Fagaceae (34 out of 1101) are also notable families with disproportionately high sampling.  
 
-These 1,647 species tend to be very well sampled in GBIF, so the sampling per GBIF observation in the other databases tends be higher.
+These 1,647 species tend to be very well sampled in GBIF, so the sampling per GBIF observation in the other databases tends be higher.  These include the dominant trees and shrubs of North America, Europe, and SE Australia.  For example the Diaz et al. analysis included more than half of the GBIF observations at 50 degrees N latitude, but less than 10 \% of the species (Figure \ref{fig:zanne_diaz_gam}).
 
 \subsection{Species that we know a little about}
 
-The biases in the databases differ greatly.  GBIF is extremely poorly sampled for mosses and liverworts.  
+For about 12 \% of global plant species---39,650 species (see Table \ref{tab:two_and_three_way_comparisons}), we know \emph{something} about their genetic make--up, \emph{something} their traits, and at least have a geo-referenced record for a location.  
 
-\citep{hinchliff2014some}
+Beyond these 39,650 species the databases differ greatly in their coverage.  GBIF, which has by far the most complete sampling of the databases, is nonetheless extremely poorly sampled for mosses and liverworts \ref{fig:gbif_treemap}.  
 
-\subsection{Species that we know only location}
+In Genbank we found data for 14,565 genera before scrubbing and 12,154 after \citep[see][for a detailed analysis of number of genes and phylogenetic distribution of the data]{hinchliff2014some}.  This is 71.4 \% of the genera that are currently accepted by the plant list.  
+
+TRY has data for 9,717 accepted genera.  
+
+
+There are 
+
 
 \subsection{Species that we know nothing about}
 
 \section{Discussion}
 
-
+We used a 
 
 
 Data interpolation techniques rely principally on phylogenetic relatedness.  
@@ -70,6 +78,12 @@ does not include model uncertainty.  And as most simple models of trait evolutio
 process among the branches of the tree is 
 we have a ways to go before we fully understand uncertainty in trait imputation approaches.   
 
+\section{Acknowledgement}
+
+This research includes computations using the Linux computational cluster Katana supported by the Faculty of Science and the Center for Ecosystem Science, UNSW Australia.
+This study would not have been possible without the 128GB of RAM available to each node on that cluster.  
+
+
 \section{Tables}
 
 
@@ -78,7 +92,7 @@ we have a ways to go before we fully understand uncertainty in trait imputation 
 
 \input{tables/summary_of_endemic_analysis}
 
-\input{ tables/two_and_three_way_comparisons}
+\input{tables/two_and_three_way_comparisons}
 
 \section{Figures}
 
@@ -97,14 +111,39 @@ we have a ways to go before we fully understand uncertainty in trait imputation 
 \begin{figure}[h!]
 \centering
   \includegraphics[width=\textwidth]{figures/multi_gam_zae_diaz.png}
+  \label{fig:zanne_diaz_gam}
 \end{figure}
 
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width=15cm,height=15cm,keepaspectratio]{figures/sampling_in_try_by_family.pdf}
+\includegraphics[width=15cm,height=15cm,keepaspectratio]{figures/treemap_try.all.names.pdf}
 \caption{Size of the boxes are proportional to the species richness of each family.  Proportion of TPL 1.1 accepted names that were in TRY-db as of 2015.  }
 \label{fig:try_treemap}
+\end{figure}
+\clearpage
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=15cm,height=15cm,keepaspectratio]{figures/treemap_gbif.pdf}
+\caption{Size of the boxes are proportional to the species richness of each family.  Proportion of TPL 1.1 accepted names that were in GBIF as of 2015.  }
+\label{fig:gbif_treemap}
+\end{figure}
+\clearpage
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=15cm,height=15cm,keepaspectratio]{figures/treemap_genbank.pdf}
+\caption{Size of the boxes are proportional to the species richness of each family.  Proportion of TPL 1.1 accepted names that were in GBIF as of 2015.  }
+\label{fig:genbank_treemap}
+\end{figure}
+\clearpage
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=15cm,height=15cm,keepaspectratio]{figures/hyp.pdf}
+\caption{ space by taxa.  }
+\label{fig:hyp}
 \end{figure}
 \clearpage
 
