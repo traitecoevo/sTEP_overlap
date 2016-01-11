@@ -15,6 +15,8 @@ make_treemaps<-function(y){
     
     #head(ranking)
     
+    names(y)[names(y)=="try.all.names"]<-"try-database"
+    
     pdf(sprintf("figures/treemap_%s.pdf",names(y[i])))
     treemap(ranking,
             index=c("group", "family"),
@@ -38,6 +40,8 @@ make_well_known_treemap<-function(y){
   lt$well_known <- lt$species%in%y$gbif & lt$species%in%y$zae & lt$species%in%y$diaz
   ranking<-summarize(group_by(lt,family),sr=length(species),prop.sampled=mean(well_known),group=group[1])
   
+  
+  
   r2<-subset(ranking,prop.sampled<0.2)
   
   pdf("figures/treemap_well_known.pdf")
@@ -50,4 +54,22 @@ make_well_known_treemap<-function(y){
           palette=brewer.pal(11,"RdBu"),
           range=c(0,0.2))
   dev.off()
+  
+  names(y)[names(y)=="try.all.names"]<-"try"
+  
+  lt$not_known <-  !lt$species%in%y$genbank & !lt$species%in%y$try
+  ranking<-summarize(group_by(lt,family),sr=length(species),prop.sampled=mean(not_known),group=group[1])
+  ranking$prop.sampled <- 1 - ranking$prop.sampled
+  
+  pdf("figures/treemap_not_known.pdf")
+  treemap(ranking,
+          index=c("group", "family"),
+          vSize="sr",
+          vColor="prop.sampled",
+          type="manual",
+          title="Taxonomic distribution of sampling for either genetic or functional data",
+          palette=brewer.pal(11,"RdBu"),
+          range=c(0,1))
+  dev.off()
+  
 }

@@ -42,7 +42,7 @@ $^3$ global vagabond}
 
 \section{Methods}
 
-\section{Results}
+\section{Results and Discussion}
 
 \subsection{Species  that we know a lot about}
 
@@ -52,24 +52,23 @@ These 1,647 species tend to be very well sampled in GBIF, so the sampling per GB
 
 \subsection{Species that we know a little about}
 
-For about 12 \% of global plant species---39,650 species (see Table \ref{tab:two_and_three_way_comparisons}), we know \emph{something} about their genetic make--up, \emph{something} their traits, and at least have a geo-referenced record for a location.  
+For about 12 \% of global plant species---39,650 species (see Table \ref{tab:two_and_three_way_comparisons}), we know \emph{something} about their genetic make--up, \emph{something} their traits, and at least have a geo-referenced record for a location.  These are primarily temperate species (see figure \ref{fig:genbank_try_gam}).
 
-Beyond these 39,650 species the databases differ greatly in their coverage.  GBIF, which has by far the most complete sampling of the databases, is nonetheless extremely poorly sampled for mosses and liverworts \ref{fig:gbif_treemap}.  
+Beyond these 39,650 species, the databases differ greatly in their coverage.  GBIF, which has by far the most complete sampling of the databases, is nonetheless extremely poorly sampled for mosses and liverworts---all of the top ten most undersampled families are either mosses or liverworts (See Figure \ref{fig:gbif_treemap} and Table \ref{undersampled_families}).  To a lesser extent mosses and liverworts are also undersampled for both genes and traits (Table \ref{undersampled_families}).  
 
-In Genbank we found data for 14,565 genera before scrubbing and 12,154 after \citep[see][for a detailed analysis of number of genes and phylogenetic distribution of the data]{hinchliff2014some}.  This is 71.4 \% of the genera that are currently accepted by the plant list.  
+For both traits and genes, Orchidaceae, despite its widespread cultivation and intense horticultural interest, remains undersampled (Table \ref{undersampled_families})---this is like both on account of its diversity---27732 accepted species---and the rarity and inaccessibility of many of them.  Acanthaceae is another family that is under-sampled for both genes and traits.  Myrtaceae was a surprising entry on the genetically undersampled list.  The family is well sampled within Australia but very poorly sampled across the rest of its distribution (Figure \ref{fig:hyp}).  
 
-TRY has data for 9,717 accepted genera.  
+In Genbank we found data for 14,565 genera before scrubbing and 12,154 after \citep[see][for a detailed analysis of number of genes and phylogenetic distribution of the data]{hinchliff2014some}.  This is 71.4 \% of the genera that are currently accepted by the plant list.  TRY has data for 9,717 accepted genera or 66.7 \% of the accepted genera.  The glass--half empty view is that we know much more than we did in the past.  The glass--half empty view is that for one--third of world's plant \emph{genera} we know nothing about how they ecologically make their living.  
 
+\subsection{Species that we know almost nothing about}
 
-There are 
+There are three classes of species that are very hard to say anything about.  First, are the species that have yet to be described.  Only true specialists can have a sense where in the world they are, whether they've already been collected and mis-identified, and how to move taxonomic knowledge forward.  Second, are the species that have accepted names, but no additional data.  Presumably there is a type specimen somewhere in the world, with a location, but that data has not been digitized or for some other reason .  There are efforts underway to try to address this problem (REF HERBARIA DIGITIZATION PROJECTS), and data for this issue will likely improve quickly.  In this area it is worth prioritizing herbaria that are known to have collections of the absent species.  
 
+For species with no genetic data, bar coding projects (REFS) will help.  
 
-\subsection{Species that we know nothing about}
+For species with no functional trait data, the current data is very highly focused on clades with economic importance including Poaceae (67\% sampled), Pinaceae (85\%), Sapotaceae (51 \%), and others.  There are also clades that are particularly unusual including Proteaceae \citep[73\% see][]{Cornwell}, Zamiaceae (67\%), and Lycopodiaceae (.  
 
-\section{Discussion}
-
-We used a 
-
+\subsection{Data imputation and its connection to the comparative methods}
 
 Data interpolation techniques rely principally on phylogenetic relatedness.  
 Most, models of the expected similarity based on relatedness rely on an underlying implicit or explicit model of trait evolution.  
@@ -77,6 +76,13 @@ Usefully some of the recently proposed methods do allow for characterising uncer
 does not include model uncertainty.  And as most simple models of trait evolution for plants are far from adequate (Pennell), and heterogeneity in evolutionary 
 process among the branches of the tree is 
 we have a ways to go before we fully understand uncertainty in trait imputation approaches.   
+
+The most difficult problem for data imputation is that for poorly sampled clades, we do not know enough to know if the evolutionary process is different in those clades.  As such there is no way to characterize model uncertainty for these groups until there is enough data to understand something about the evolutionary process for the traits of interest.  In other words, there is no magic substitute for 
+
+
+\subsection{Paths forward}
+
+
 
 \section{Acknowledgement}
 
@@ -99,11 +105,12 @@ This study would not have been possible without the 128GB of RAM available to ea
 \begin{figure}[h!]
 \centering
   \includegraphics[width=\textwidth]{figures/multi_gam.png}
+   \label{fig:genbank_try_gam}
 \end{figure}
 
 \begin{figure}[h!]
 \centering
-  \includegraphics[width=15cm,height=15cm,keepaspectratio]{figures/treemap_well_known.pdf}
+  \includegraphics[width=\textwidth]{figures/treemap_well_known.pdf}
   \caption{Size of boxes represents the total species richness of each family (TPL 1.1) and the color represents the proportion of species which have been 
   well characterised both for functional traits and for genes.}
 \end{figure}
@@ -117,7 +124,7 @@ This study would not have been possible without the 128GB of RAM available to ea
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width=15cm,height=15cm,keepaspectratio]{figures/treemap_try.all.names.pdf}
+\includegraphics[width=\textwidth]{figures/treemap_try-database.pdf}
 \caption{Size of the boxes are proportional to the species richness of each family.  Proportion of TPL 1.1 accepted names that were in TRY-db as of 2015.  }
 \label{fig:try_treemap}
 \end{figure}
@@ -125,7 +132,7 @@ This study would not have been possible without the 128GB of RAM available to ea
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width=15cm,height=15cm,keepaspectratio]{figures/treemap_gbif.pdf}
+\includegraphics[width=\textwidth]{figures/treemap_gbif.pdf}
 \caption{Size of the boxes are proportional to the species richness of each family.  Proportion of TPL 1.1 accepted names that were in GBIF as of 2015.  }
 \label{fig:gbif_treemap}
 \end{figure}
@@ -133,7 +140,7 @@ This study would not have been possible without the 128GB of RAM available to ea
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width=15cm,height=15cm,keepaspectratio]{figures/treemap_genbank.pdf}
+\includegraphics[width=\textwidth]{figures/treemap_genbank.pdf}
 \caption{Size of the boxes are proportional to the species richness of each family.  Proportion of TPL 1.1 accepted names that were in GBIF as of 2015.  }
 \label{fig:genbank_treemap}
 \end{figure}
@@ -141,8 +148,16 @@ This study would not have been possible without the 128GB of RAM available to ea
 
 \begin{figure}[h!]
 \centering
-\includegraphics[width=15cm,height=15cm,keepaspectratio]{figures/hyp.pdf}
+\includegraphics[width=\textwidth]{figures/hyp.pdf}
 \caption{ space by taxa.  }
+\label{fig:hyp}
+\end{figure}
+\clearpage
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=\textwidth]{figures/treemap_not_known.pdf}
+\caption{The sampling of species by family for \emph{either} genetic or functional data.  Size of the rectangles represents the species richness of the group. }
 \label{fig:hyp}
 \end{figure}
 \clearpage

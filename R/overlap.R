@@ -75,9 +75,9 @@ do_overlap_analysis<-function(){
 }
 
 write_overlap_table<-function(y){
-  out<-c(sapply(y,length),calculate.overlap(y,2),calculate.overlap(y,3))
-  write.csv(out,"tables/two_and_three_way_comparisons.csv")
-  print(xtable(data.frame(out),caption="this is a caption"),file="tables/two_and_three_way_comparisons.tex",booktabs=TRUE,floating=FALSE,caption.placement="top", label = "tab:two_and_three_way_comparisons")
+  Number_of_overlapping_species<-c(sapply(y,length),calculate.overlap(y,2),calculate.overlap(y,3))
+  write.csv(Number_of_overlapping_species,"tables/two_and_three_way_comparisons.csv")
+  print(xtable(data.frame(Number_of_overlapping_species),caption="this is a caption"),file="tables/two_and_three_way_comparisons.tex",booktabs=TRUE,floating=FALSE,caption.placement="top", label = "tab:two_and_three_way_comparisons")
 }
 
 
