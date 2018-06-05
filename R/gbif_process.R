@@ -32,6 +32,7 @@ gbif_tpl<-function(gbif){
 get_gbif<-function(){
   if (Sys.info()[[1]]=="Linux") a<-fread("../../../srv/scratch/z3484779/overlap-data/raw_data/cooked.csv")
   else a<-fread("occur.csv")
+  names(a)<-c("species","lat","long")
   return(a)
 }
 
