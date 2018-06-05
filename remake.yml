@@ -14,6 +14,7 @@ packages:
   - taxonlookup
   - xtable
   - treemap
+  - ggtree
 
 sources:
   - R
@@ -21,37 +22,17 @@ sources:
 targets:
   all:
     depends:
-      - ms.pdf
-
-  ms.pdf:
-    command: latex_build_clean("ms.tex", "refs.bib")
-    depends:
-      - figures
-      - tables
-  
-  cont2.5.grd:
-    command: get_cont_raster()
-
-  figures:
-    depends:
       - figures/sampling_in_try_by_family.pdf
-      - figures/multi_gam_zae_diaz.png
       - figures/multi_gam.png
-      - figures/treemap_genbank.pdf
-      - figures/treemap_well_known.pdf
-
-  tables:
-    depends:
       - tables/all_families_ranking.tex
       - tables/summary_of_endemic_analysis.tex
       - tables/two_and_three_way_comparisons.tex
   
+  cont2.5.grd:
+      command: get_cont_raster()
+  
   figures/multi_gam.png:
     command: plot_gbif_bins()
-    check: exists
-    
-  figures/multi_gam_zae_diaz.png:
-    command: plot_gbif_bins_zae_diaz()
     check: exists
     
   tables/all_families_ranking.tex:
