@@ -30,7 +30,7 @@ gbif_tpl<-function(gbif){
 }
 
 get_gbif<-function(){
-  if (Sys.info()[[1]]=="Linux") a<-fread("../../../srv/scratch/z3484779/gbif/gbif_cleaner.csv")
+  if (Sys.info()[[1]]=="Linux") a<-fread("../../../srv/scratch/z3484779/overlap-data/raw_data/cooked.csv")
   else a<-fread("occur.csv")
   return(a)
 }
@@ -82,7 +82,7 @@ do.gam.analysis<-function(b,type){
   try_sp<-read.delim("TryAccSpecies.txt",as.is=TRUE)
   try_sp$sp_scrubb<-scrub(try_sp$AccSpeciesName)
   b$try.yes.no<-b$species%in%try_sp$sp_scrubb
-  out_try<-bam(try.yes.no~s(lat),family=binomial(),data=b,cluster=ou,gc.level=2)
+  out_try<-bam(try.yes.no~s(decimalLatitude),family=binomial(),data=b,cluster=ou,gc.level=2)
   gam.df<-data.frame(lat=c(b$lat,b$lat),fit=c(fitted(out_try),fitted(gam.genbank)),dataset=c(rep("TRY",length(b$lat)),rep("genbank",length(b$lat))),type=type)
   stopCluster(ou)
   return(gam.df)
