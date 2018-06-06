@@ -202,7 +202,7 @@ check_endemics<-function(){
   one.cont.list$one.cont.list.genbank.yes.no<-one.cont.list$species%in%genbank.scrubbed
   tt<-table(one.cont.list$cont,one.cont.list$one.cont.list.yes.no)
   tt[,2]/(tt[,1]+tt[,2])
-  try_sp<-read_csv("TryAccSpecies.txt",col_names="AccSpeciesName"))
+  try_sp<-read_csv("TryAccSpecies.txt",col_names="AccSpeciesName")
   try_sp$sp_scrubb<-scrub(try_sp$AccSpeciesName)
   one.cont.list$try.yes.no<-one.cont.list$species%in%try_sp$sp_scrubb
   tt<-table(one.cont.list$cont,one.cont.list$try.yes.no)
