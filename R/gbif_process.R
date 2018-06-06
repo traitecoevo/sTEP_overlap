@@ -44,7 +44,7 @@ get_gbif<-function(){
 
 get_genbank<-function(){
   genbank<-read.csv("genBankList.txt",header=FALSE,as.is=TRUE)
-  genbank.scrubbed<-tolower(scrub(genbank$V1))
+  genbank.scrubbed<-tolower(genbank$V1)
   out<-genbank.scrubbed[!is.na(genbank.scrubbed)]
   return(out)
 }
