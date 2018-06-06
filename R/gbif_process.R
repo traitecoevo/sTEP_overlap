@@ -100,7 +100,7 @@ run_gam_df<-function(){
   return(out)
 }
 
-plot_gbif_bins<-function(out)
+plot_gbif_bins<-function(out){
   #plot
   png("figures/multi_gam.png",width=8.5,height=5)
   print(ggplot(out,aes(x=lat,y=fit))+
