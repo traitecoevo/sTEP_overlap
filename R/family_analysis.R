@@ -136,13 +136,18 @@ read.genBank<-function(){
 #   mutate(sp=use.synonym.lookup(sp))->gbif
 #goodNames<-sync.species.lists(gbif$sp)
 
+firstup <- function(x) {
+   substr(x, 1, 1) <- toupper(substr(x, 1, 1))
+x
+}
+
 # genbank<-read.genBank()
 # oceania<-process.endemic.list(known.oceania)
 # oceania.try<-prepare.sampling.df(sampled.list = try.sp,ref.list = oceania)
 # aussie.try<-prepare.sampling.df(sampled.list = try.sp,ref.list = aussie)
 # ocenaia.genbank<-prepare.sampling.df(sampled.list=genbank,ref.list=oceania)
 run_family_analysis<-function(db_list){
-  goodNames<-sync.species.lists(db_list)
+  goodNames<-sync.species.lists(firstup(db_list))
   
   #oceania.try<-filter(oceania.try,!is.na(family))
   family.list<-as.list(unique(goodNames$family))
