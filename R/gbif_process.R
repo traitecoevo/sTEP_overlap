@@ -87,8 +87,8 @@ do.gam.analysis<-function(b,type){
   ou<-makeCluster(15,type="SOCK")
   gam.genbank<-bam(genbank.yes.no~s(lat),family=binomial(),data=b,cluster=ou,gc.level=2)
   try_sp<-read.delim("TryAccSpecies.txt",as.is=TRUE)
-  try_sp$sp_scrubb<-scrub(try_sp$AccSpeciesName)
-  b$try.yes.no<-b$species%in%try_sp$AccSpeciesName
+  #try_sp$sp_scrubb<-scrub(try_sp$AccSpeciesName)
+  b$try.yes.no<-b$species%in%tolower(try_sp$AccSpeciesName)
   out_try<-bam(try.yes.no~s(decimalLatitude),family=binomial(),data=b,cluster=ou,gc.level=2)
   gam.df<-data.frame(lat=c(b$lat,b$lat),fit=c(fitted(out_try),fitted(gam.genbank)),dataset=c(rep("TRY",length(b$lat)),rep("genbank",length(b$lat))),type=type)
   stopCluster(ou)
@@ -99,19 +99,24 @@ do.gam.analysis<-function(b,type){
 plot_gbif_bins<-function(){
   a<-get_gbif()
   
-  #do the gam on a random subsample
+  #random subsample
   random.obs<-a[sample(1:dim(a)[1],5*10^6,replace=F),]
-  gam.df.obs<-do.gam.analysis(random.obs,type="by gbif observation")
   
-  #do the gam on species dataset
+  #species median dataset
   by.species<-summarize(group_by(a,species),lat=median(lat))
+  
+  #memmory clean up
   rm(a)
   gc()
+  
+  #run the gams
+  gam.df.obs<-do.gam.analysis(random.obs,type="by gbif observation")
   gam.df.sp<-do.gam.analysis(by.species,type="by species")
  
+  #stick data frame together
   out<-rbind(gam.df.obs,gam.df.sp)
   
-  
+  #plot
   png("figures/multi_gam.png")
   print(ggplot(out,aes(x=lat,y=fit))+
           ylab("Proportion in database")+
