@@ -62,31 +62,13 @@ make_sampling_map<-function(a){
   dev.off()
 }
 
-zae.diaz.analysis<-function(b,type){
-  zae<-read.tree("zanne_tpl_1_1.tre")
-  z<-scrub(zae$tip.label)
-  b$genbank.yes.no<-b$species%in%z
-  ou<-makeCluster(15,type="SOCK")
-  gam.genbank<-bam(genbank.yes.no~s(lat),family=binomial(),data=b,cluster=ou,gc.level=2)
-  #try_sp<-read.delim("TryAccSpecies.txt",as.is=TRUE)
-  #try_super<-try_sp$AccSpeciesName[which(try_sp$TraitNum>5)]
-  #ts<-scrub(try_super)
-  diaz<-read_csv("diaz_etal_names.csv")$name_TLP_TRY30_resolved
-  diaz<-use.synonym.lookup(scrub(diaz))
-  b$try.yes.no<-b$species%in%diaz
-  out_try<-bam(try.yes.no~s(lat),family=binomial(),data=b,cluster=ou,gc.level=2)
-  
-  gam.df<-data.frame(lat=c(b$lat,b$lat),fit=c(fitted(out_try),fitted(gam.genbank)),dataset=c(rep("Well sampled TRY",length(b$lat)),rep("Zanne",length(b$lat))),type=type)
-  stopCluster(ou)
-  return(gam.df)
-}
 
 do.gam.analysis<-function(b,type){
   genbank.scrubbed<-get_genbank()
   b$genbank.yes.no<-b$species%in%genbank.scrubbed
   ou<-makeCluster(15,type="SOCK")
   gam.genbank<-bam(genbank.yes.no~s(lat),family=binomial(),data=b,cluster=ou,gc.level=2)
-  try_sp<-read.delim("TryAccSpecies.txt",as.is=TRUE)
+  try_sp<-read_csv("TryAccSpecies.txt",col_names="AccSpeciesName")
   #try_sp$sp_scrubb<-scrub(try_sp$AccSpeciesName)
   b$try.yes.no<-b$species%in%tolower(try_sp$AccSpeciesName)
   out_try<-bam(try.yes.no~s(lat),family=binomial(),data=b,cluster=ou,gc.level=2)
