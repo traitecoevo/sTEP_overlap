@@ -109,15 +109,13 @@ read.in.try<-function(){
   require(dplyr)
   fread("TryAccSpecies.txt")%>%
     dplyr::select(AccSpeciesName)%>%
-    mutate(sp=scrub(AccSpeciesName))%>%
-    mutate(sp.fix=use.synonym.lookup(sp))->try.all
+    mutate(sp.fix=use.synonym.lookup(AccSpeciesName))->try.all
   try.sp<-unique(try.all$sp.fix)
   return(try.sp)
 }
 
 process.endemic.list<-function(sp.names){
   sp.names%>%
-    mutate(species=scrub(species))%>%
     mutate(sp.fix=use.synonym.lookup(species))->endem.fixed
   endemic.out<-unique(endem.fixed$sp.fix)
   return(endemic.out)
@@ -126,8 +124,7 @@ process.endemic.list<-function(sp.names){
 read.genBank<-function(){
   # this is the genbank species list from the NCBI Browser website
   read.delim("genBankList.txt",header=FALSE,as.is=T)%>%
-    mutate(V2=scrub(V1))%>%
-    mutate(V3=use.synonym.lookup(V2))->genbank.all
+    mutate(V3=use.synonym.lookup(V1))->genbank.all
   genbank<-unique(genbank.all$V3)
   return(genbank)
 }

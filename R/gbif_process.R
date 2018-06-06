@@ -33,12 +33,18 @@ get_gbif<-function(){
   if (Sys.info()[[1]]=="Linux") a<-fread("../../../srv/scratch/z3484779/overlap-data/raw_data/cooked.csv")
   else a<-fread("occur.csv")
   names(a)<-c("species","lat","long")
-  return(a)
+  read_csv("../../../srv/scratch/z3484779/taxonomicResources//plantList11syns.csv")%>%
+    dplyr::select(correct.names)%>%
+    mutate(correct.names=tolower(gsub("_", " ", correct.names)))->goodNames
+    accNames<-unique(goodNames$correct.names)
+  b<-filter(a,species%in%accNames) 
+
+  return(b)
 }
 
 get_genbank<-function(){
   genbank<-read.csv("genBankList.txt",header=FALSE,as.is=TRUE)
-  genbank.scrubbed<-scrub(genbank$V1)
+  genbank.scrubbed<-tolower(scrub(genbank$V1))
   out<-genbank.scrubbed[!is.na(genbank.scrubbed)]
   return(out)
 }
@@ -82,7 +88,7 @@ do.gam.analysis<-function(b,type){
   gam.genbank<-bam(genbank.yes.no~s(lat),family=binomial(),data=b,cluster=ou,gc.level=2)
   try_sp<-read.delim("TryAccSpecies.txt",as.is=TRUE)
   try_sp$sp_scrubb<-scrub(try_sp$AccSpeciesName)
-  b$try.yes.no<-b$species%in%try_sp$sp_scrubb
+  b$try.yes.no<-b$species%in%try_sp$AccSpeciesName
   out_try<-bam(try.yes.no~s(decimalLatitude),family=binomial(),data=b,cluster=ou,gc.level=2)
   gam.df<-data.frame(lat=c(b$lat,b$lat),fit=c(fitted(out_try),fitted(gam.genbank)),dataset=c(rep("TRY",length(b$lat)),rep("genbank",length(b$lat))),type=type)
   stopCluster(ou)
@@ -114,30 +120,6 @@ plot_gbif_bins<-function(){
   dev.off()
 }
 
-
-plot_gbif_bins_zae_diaz<-function(){
-  a<-get_gbif()
-  
-  #do the gam on a random subsample
-  random.obs<-a[sample(1:dim(a)[1],5*10^5,replace=F),]
-  gam.df.obs<-zae.diaz.analysis(random.obs,type="by gbif observation")
-  
-  #do the gam on species dataset
-  by.species<-summarize(group_by(a,species),lat=median(lat))
-  rm(a)
-  gc()
-  gam.df.sp<-zae.diaz.analysis(by.species,type="by species")
-  
-  out<-rbind(gam.df.obs,gam.df.sp)
-  
-  
-  png("figures/multi_gam_zae_diaz.png")
-  print(ggplot(out,aes(x=lat,y=fit))+
-          ylab("Proportion in database")+
-          geom_line(aes(col=dataset,linetype=type))+
-          theme_classic())
-  dev.off()
-}
 
 
 mean_gbif<-function(a){
