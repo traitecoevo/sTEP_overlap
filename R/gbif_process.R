@@ -78,11 +78,11 @@ do.gam.analysis<-function(b,type){
 }
 
 
-plot_gbif_bins<-function(){
+run_gam_df<-function(){
   a<-get_gbif()
   
   #random subsample
-  random.obs<-a[sample(1:dim(a)[1],1*10^7,replace=F),]
+  random.obs<-a[sample(1:dim(a)[1],2*10^7,replace=F),]
   
   #species median dataset
   by.species<-summarize(group_by(a,species),lat=median(lat))
@@ -97,9 +97,12 @@ plot_gbif_bins<-function(){
  
   #stick data frame together
   out<-rbind(gam.df.obs,gam.df.sp)
-  
+  return(out)
+}
+
+plot_gbif_bins<-function(out)
   #plot
-  png("figures/multi_gam.png")
+  png("figures/multi_gam.png",width=8.5,height=5)
   print(ggplot(out,aes(x=lat,y=fit))+
           ylab("Proportion in database")+
           geom_line(aes(col=dataset,linetype=type))+

@@ -30,10 +30,12 @@ targets:
   
   cont2.5.grd:
       command: get_cont_raster()
+
+  gam_df:
+    command: run_gam_df()
   
   figures/multi_gam.png:
-    command: plot_gbif_bins()
-    check: exists
+    command: plot_gbif_bins(gam_df)
     
   tables/all_families_ranking.tex:
     command: do_big_list_family_anlysis()
