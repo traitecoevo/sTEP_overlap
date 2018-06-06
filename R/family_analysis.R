@@ -107,7 +107,7 @@ calc.proportion<-function(family.in,goodNames=goodNames){
 
 read.in.try<-function(){
   require(dplyr)
-  read_csv("TryAccSpecies.txt",col_names=FALSE)%>%
+  read_csv("TryAccSpecies.txt",col_names="AccSpeciesName")%>%
     dplyr::select(AccSpeciesName)%>%
     mutate(sp.fix=use.synonym.lookup(AccSpeciesName))->try.all
   try.sp<-unique(try.all$sp.fix)
