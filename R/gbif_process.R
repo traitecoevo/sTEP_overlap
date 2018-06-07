@@ -83,7 +83,7 @@ do.gam.analysis<-function(b,type){
                     fitted(gam.genbank),
                     fitted(gam_try_plus_genbank)),
                     dataset=c(rep("TRY",length(b$lat)),
-                    rep("genbank",length(b$lat))
+                    rep("genbank",length(b$lat)),
                     rep("genbank_plus_try",length(b$lat))),
                     type=type)
   stopCluster(ou)
