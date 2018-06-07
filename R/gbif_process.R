@@ -91,6 +91,39 @@ do.gam.analysis<-function(b,type){
 }
 
 
+plot_gbif_sampling<-function(){
+   b<-get_gbif()
+   genbank.scrubbed<-get_genbank()
+  b$genbank.yes.no<-b$species%in%genbank.scrubbed
+  ou<-makeCluster(15,type="SOCK")
+  try_sp<-read_csv("TryAccSpecies.txt",col_names="AccSpeciesName")
+  #try_sp$sp_scrubb<-scrub(try_sp$AccSpeciesName)
+  b$try.yes.no<-b$species%in%tolower(try_sp$AccSpeciesName)
+ 
+  b$try.genbank.yes.no<-b$species%in%tolower(try_sp$AccSpeciesName)&
+                        b$species%in%genbank.scrubbed
+  group_by(b,species)%>%
+  summarize(number_of_gbif_obs=n(),try_presence=mean(try.yes.no),genbank_presence=mean(genbank.yes.no))->z
+
+  z$database_status <- ifelse(z$try_presence==1&z$genbank_presence==0, "Only Try",
+                              ifelse(z$try_presence==0&z$genbank_presence==1, "Only Genbank",
+                                            ifelse(z$try_presence==1&z$genbank_presence==1, "Both Try and Genbank",
+                                                   ifelse(z$try_presence==0&z$genbank_presence==0, "Neither Try nor Genbank","error"
+                                                   ))))
+
+  z$database_status <- factor(z$database_status,levels = c("Both Try and Genbank", "Only Try", "Only Genbank", "Neither Try nor Genbank"))
+     pdf("figures/hist_gbif.pdf",width=8.5,height=5)
+  print(ggplot(z,aes(x=number_of_gbif_obs,fill=database_status))+
+          geom_histogram(position = "stack", binwidth=0.4)+
+          scale_x_log10()+
+        theme_classic()+
+        scale_fill_brewer(palette="Set2",type="qual")
+        )
+  dev.off()                    
+
+}
+
+
 run_gam_df<-function(){
   a<-get_gbif()
   
