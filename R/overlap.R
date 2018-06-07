@@ -55,21 +55,14 @@ calculate.overlap <- function(y, i){
 
 
 do_overlap_analysis<-function(){
-  z.tree<-read.tree("zanne_tpl_1_1.tre")
-  zae<-z.tree$tip.label
-  zae<-use.synonym.lookup(sub("_"," ",zae))
   lookup <- read_csv("../../../srv/scratch/z3484779/taxonomicResources//plantList11syns.csv")
   tpl_names <- unique(sub("_"," ",lookup$correct.names))
-  diaz<-read_csv("diaz_etal_names.csv")$name_TLP_TRY30_resolved
-  diaz<-use.synonym.lookup(scrub(diaz))
   gbif<-get_gbif_names()
   try_names<-read.in.try()
   y<-list(
     genbank=get_genbank()[get_genbank()%in%tpl_names],
     try.all.names=try_names[try_names%in%tpl_names],
-    gbif=gbif[gbif%in%tpl_names],
-    zae=zae[zae%in%tpl_names],
-    diaz=diaz[diaz%in%tpl_names]
+    gbif=gbif[gbif%in%tpl_names]
   )
   return(y)
 }
