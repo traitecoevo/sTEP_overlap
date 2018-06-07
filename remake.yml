@@ -25,7 +25,6 @@ targets:
       - figures/sampling_in_try_by_family.pdf
       - figures/multi_gam.png
       - tables/all_families_ranking.tex
-      - tables/summary_of_endemic_analysis.tex
       - tables/two_and_three_way_comparisons.tex
   
   cont2.5.grd:
@@ -39,18 +38,9 @@ targets:
     
   tables/all_families_ranking.tex:
     command: do_big_list_family_anlysis()
-    
-  tables/summary_of_endemic_analysis.tex:
-    command: do.endemic.analysis()
 
   overlap_data:
     command: do_overlap_analysis()
 
   tables/two_and_three_way_comparisons.tex:
     command: write_overlap_table(overlap_data)
-
-  figures/treemap_genbank.pdf:
-    command: make_treemaps(overlap_data)
-
-  figures/treemap_well_known.pdf:
-    command: make_well_known_treemap(overlap_data)

@@ -8,6 +8,7 @@ ms.log
 ms.out
 ms.pdf
 .remake/
+data/
 tables/*.csv
 dwarf.pbs
 one_cont_list.csv
