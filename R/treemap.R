@@ -73,9 +73,10 @@ make_well_known_treemap<-function(y){
   dev.off()
   
 }
-
-
-
+read.in.try<-function(){
+t_try<-read_csv("TryAccSpecies.txt",col_names="AccSpeciesName")
+return(tolower(t_try$AccSpeciesName))
+}
 
 makephylo<-function(){
   t_try<-read_csv("TryAccSpecies.txt",col_names="AccSpeciesName")
