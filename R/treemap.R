@@ -85,16 +85,20 @@ makephylo<-function(){
     summarise(prop.sampled=mean(in.list))%>%
     filter(!is.na(order))->try.sampled.df
   
+  t_gen<-get_genbank()
   
+  gen_out<-sync.species.lists(firstup(t_gen))
+  group_by(gen_out,order)%>%
+    summarise(prop.sampled=mean(in.list))%>%
+    filter(!is.na(order))->gen.sampled.df
   
-  phy.df<-data.frame(try=sampled.df$prop.sampled)
-  row.names(phy.df) <- sampled.df$order
+  phy.df<-data.frame(try=try.sampled.df$prop.sampled,gen=gen.sampled.df$prop.sampled)
+  row.names(phy.df) <- try.sampled.df$order
   
   phy.o.dt <-
-    ape::drop.tip(tree, tree$tip.label[!tree$tip.label %in% sampled.df$order])
+    ape::drop.tip(tree, tree$tip.label[!tree$tip.label %in% try.sampled.df$order])
   po <-
-    ggtree(phy.o.dt) + geom_tiplab(aes(angle = angle), size =
-                                                        1.5)
+    ggtree(phy.o.dt) + geom_tiplab(size =1.5)
   #po<-ggtree(phy.o.dt)+geom_tiplab()
   cols = sample(rainbow(10), 40, replace = T)
   
