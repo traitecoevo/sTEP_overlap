@@ -78,8 +78,8 @@ make_well_known_treemap<-function(y){
 
 
 makephylo<-function(){
-  t_try<-read.in.try()
-  try_out<-sync.species.lists(firstup(t_try))
+  t_try<-read_csv("TryAccSpecies.txt",col_names="AccSpeciesName")
+  try_out<-sync.species.lists(firstup(t_try$AccSpeciesName))
   tree<-readRDS("phy/phy.o.rds")
   group_by(try_out,order)%>%
     summarise(prop.sampled=mean(in.list))%>%
