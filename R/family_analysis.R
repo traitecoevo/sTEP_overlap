@@ -72,6 +72,7 @@ sync.species.lists<-function(sampled.list){
   goodNames$genera<-sapply(as.character(goodNames$gs),FUN=function(x) strsplit(x," ")[[1]][1],USE.NAMES=F)
   pl<-plant_lookup()
   goodNames$family<-pl$family[match(goodNames$genera,pl$genus)]
+  goodNames$order<-pl$order[match(goodNames$genera,pl$genus)]
   goodNames$family[is.na(goodNames$family)]<-"bryo"
   goodNames$in.list<-goodNames$gs%in%sampled.list
   return(goodNames)
@@ -105,14 +106,14 @@ calc.proportion<-function(family.in,goodNames=goodNames){
   return(sum(fam.only$in.list)/length(fam.only$in.list))
 }
 
-read.in.try<-function(){
-  require(dplyr)
-  read_csv("TryAccSpecies.txt",col_names="AccSpeciesName")%>%
-    dplyr::select(AccSpeciesName)%>%
-    mutate(sp.fix=use.synonym.lookup(AccSpeciesName))->try.all
-  try.sp<-unique(try.all$sp.fix)
-  return(try.sp)
-}
+#read.in.try<-function(){
+#  require(dplyr)
+#  read_csv("TryAccSpecies.txt",col_names="AccSpeciesName")%>%
+#    dplyr::select(AccSpeciesName)%>%
+#    mutate(sp.fix=use.synonym.lookup(AccSpeciesName))->try.all
+#  try.sp<-unique(try.all$sp.fix)
+#  return(try.sp)
+#}
 
 process.endemic.list<-function(sp.names){
   sp.names%>%
@@ -164,7 +165,10 @@ run_family_analysis<-function(db_list){
   under<-filter(ranking,prop.sampled<0.2)
   under<-arrange(under,desc(g))
   
-  return(under[1:10,])
+  over<-filter(ranking,prop.sampled>0.2)
+  over<-arrange(over,desc(g))
+
+  return(rbind(under[1:10,],over[1:10,]))
 }
 
 do_big_list_family_anlysis<-function(){
@@ -172,7 +176,7 @@ do_big_list_family_anlysis<-function(){
   write_csv(t_try,"tables/try_families_ranking.csv")
   t_gb<-run_family_analysis(read.genBank())
   write_csv(t_gb,"tables/genbank_families_ranking.csv")
-  a<-fread("../../../srv/scratch/z3484779/gbif/gbif_cleaner.csv")
+  a<-get_gbif()
   gb_sp<-unique(a$species)
   rm(a)
   gc()

@@ -73,3 +73,32 @@ make_well_known_treemap<-function(y){
   dev.off()
   
 }
+
+
+
+
+makephylo<-function(){
+  t_try<-read.in.try()
+  try_out<-sync.species.lists(firstup(t_try))
+  tree<-readRDS("phy/phy.o.rds")
+  group_by(try_out,order)%>%
+    summarise(prop.sampled=mean(in.list))%>%
+    filter(!is.na(order))->try.sampled.df
+  
+  
+  
+  phy.df<-data.frame(try=sampled.df$prop.sampled)
+  row.names(phy.df) <- sampled.df$order
+  
+  phy.o.dt <-
+    ape::drop.tip(tree, tree$tip.label[!tree$tip.label %in% sampled.df$order])
+  po <-
+    ggtree(phy.o.dt) + geom_tiplab(aes(angle = angle), size =
+                                                        1.5)
+  #po<-ggtree(phy.o.dt)+geom_tiplab()
+  cols = sample(rainbow(10), 40, replace = T)
+  
+  
+  gheatmap(po, phy.df, offset = 2.5, width = 0.2)  + viridis::scale_fill_viridis(option ="D")
+  ggsave("figures/order_phy.pdf")
+}
