@@ -93,9 +93,28 @@ makephylo<-function(){
     summarise(prop.sampled=mean(in.list))%>%
     filter(!is.na(order))->gen.sampled.df
   
-  phy.df<-data.frame(try=try.sampled.df$prop.sampled,gen=gen.sampled.df$prop.sampled)
+gbif<-unique(get_gbif()))
+  gbif_out<-sync.species.lists(firstup(gbif))
+  group_by(gbif_out,order)%>%
+    summarise(prop.sampled=mean(in.list))%>%
+    filter(!is.na(order))->gbif.sampled.df
+
+
+well_studied<-gbif_out[gbif%in%t_gen&gbif%in%t_try$AccSpeciesName]
+well_studied_out<-sync.species.lists(firstup(well_studied))
+  group_by(well_studied_out,order)%>%
+    summarise(prop.sampled=mean(in.list))%>%
+    filter(!is.na(order))->wellstudied.sampled.df
+
+  phy.df<-data.frame(try=try.sampled.df$prop.sampled,
+                      gen=gen.sampled.df$prop.sampled,
+                      gbif=gbif.sampled.df$prop.sampled,
+                      well_studied=wellstudied.sampled.df$prop.sampled)
   row.names(phy.df) <- try.sampled.df$order
   
+
+
+
   phy.o.dt <-
     ape::drop.tip(tree, tree$tip.label[!tree$tip.label %in% try.sampled.df$order])
   po <-
@@ -103,6 +122,9 @@ makephylo<-function(){
   #po<-ggtree(phy.o.dt)+geom_tiplab()
   cols = sample(rainbow(10), 40, replace = T)
   
+
+  
+
   
   gheatmap(po, phy.df, offset = 2.5, width = 0.2)  + viridis::scale_fill_viridis(option ="D")
   ggsave("figures/order_phy.pdf")
