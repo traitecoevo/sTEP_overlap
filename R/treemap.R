@@ -93,7 +93,7 @@ makephylo<-function(){
     summarise(prop.sampled=mean(in.list))%>%
     filter(!is.na(order))->gen.sampled.df
   
-gbif<-unique(get_gbif()))
+gbif<-unique(get_gbif())
   gbif_out<-sync.species.lists(firstup(gbif))
   group_by(gbif_out,order)%>%
     summarise(prop.sampled=mean(in.list))%>%
