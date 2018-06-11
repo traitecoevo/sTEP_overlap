@@ -210,10 +210,9 @@ perform_endemic_analysis<-function(cont_name,db,one=one){
   prop<-unlist(lapply(test,function(x)x$observed[2,2]/sum(x$observed[,2])))
   sr<-unlist(lapply(test,function(x)sum(x$observed[,2])))
   
-  data_frame(family=unlist(family.list),prop.sampled=prop,sr=sr,g=g,p=p,cont_name=cont_name,
-  db=db)%>%
-    arrange(g)->ranking 
-  under<-filter(ranking,prop.sampled<0.3) # hack here to get undersampled only
+results<-data_frame(family=unlist(family.list),prop.sampled=prop,sr=sr,g=g,p=p,cont_name=cont_name)
+ # db=deparse(db))
+  under<-filter(results,prop.sampled<0.3) # hack here to get undersampled only
   under<-arrange(under,desc(g))
   return(under[1:3,])
 }
@@ -233,6 +232,7 @@ do.endemic.analysis<-function(){
 
   sum.df<-bind_rows(try_by_cont,gb_by_cont)
 
+  sum.df$db<-c(rep("try",21),rep("genbank",21))
     write_csv(sum.df,"tables/summary_of_endemic_analysis.csv")
     return(sum.df)
 }
