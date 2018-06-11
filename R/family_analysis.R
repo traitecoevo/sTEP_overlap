@@ -149,11 +149,13 @@ x
 # ocenaia.genbank<-prepare.sampling.df(sampled.list=genbank,ref.list=oceania)
 run_family_analysis<-function(db_list){
   goodNames<-sync.species.lists(firstup(db_list))
-  
+  database_mean_sampling<-mean(goodNames$in.list)
+
   #oceania.try<-filter(oceania.try,!is.na(family))
   family.list<-as.list(unique(goodNames$family))
   test<-mclapply(family.list,FUN=test.family,goodNames=goodNames)
   
+
   g<-unlist(lapply(test,function(x)x$statistic))
   p<-unlist(lapply(test,function(x)x$p.value))
   prop<-unlist(lapply(test,function(x)x$observed[2,2]/sum(x$observed[,2])))
@@ -162,10 +164,10 @@ run_family_analysis<-function(db_list){
   data.table(family=unlist(family.list),prop.sampled=prop,sr=sr,g=g,p=p)%>%
     arrange(g)->ranking
   
-  under<-filter(ranking,prop.sampled<0.2)
+  under<-filter(ranking,prop.sampled<database_mean_sampling)
   under<-arrange(under,desc(g))
   
-  over<-filter(ranking,prop.sampled>0.2)
+  over<-filter(ranking,prop.sampled>database_mean_sampling)
   over<-arrange(over,desc(g))
 
   return(rbind(under[1:10,],over[1:10,]))

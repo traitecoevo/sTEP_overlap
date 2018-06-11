@@ -157,7 +157,16 @@ plot_gbif_bins<-function(out){
   dev.off()
 }
 
+plot_gam_2<-function(gam_df){
+gam_df<-filter(gam_df,abs(lat)<67)
+ss<-gam_df[sample(1:dim(gam_df)[1],1*10^6,replace=F),]
 
+ggplot(ss,aes(x=lat,y=fit))+
+          ylab("Proportion in database")+
+          geom_line(aes(col=dataset,linetype=type))+
+        theme_classic()
+ggsave("figures/multi_gam_2.png",width=8.5,height=5)
+}
 
 mean_gbif<-function(a){
   

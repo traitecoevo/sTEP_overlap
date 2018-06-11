@@ -24,6 +24,8 @@ targets:
     depends:
       - figures/multi_gam.png
       - figures/order_phy.pdf
+      - tables/two_and_three_way_comparisons.csv
+      - tables/all_families_ranking.tex
 
 
   gam_df:
@@ -35,3 +37,11 @@ targets:
   figures/order_phy.pdf:
     command: makephylo()
     
+  overlap_data:
+    command: do_overlap_analysis()
+
+  tables/two_and_three_way_comparisons.tex:
+    command: write_overlap_table(overlap_data)
+
+  tables/all_families_ranking.tex:
+    command: do_big_list_family_anlysis()
