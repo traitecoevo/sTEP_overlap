@@ -22,14 +22,9 @@ sources:
 targets:
   all:
     depends:
-  #    - figures/sampling_in_try_by_family.pdf
       - figures/multi_gam.png
       - figures/order_phy.pdf
- #     - tables/all_families_ranking.tex
- #     - tables/two_and_three_way_comparisons.tex
-  
-  cont2.5.grd:
-      command: get_cont_raster()
+
 
   gam_df:
     command: run_gam_df()
@@ -40,11 +35,3 @@ targets:
   figures/order_phy.pdf:
     command: makephylo()
     
-#  tables/all_families_ranking.tex:
-#    command: do_big_list_family_anlysis()
-
-#  overlap_data:
-#    command: do_overlap_analysis()
-
-  tables/two_and_three_way_comparisons.tex:
-    command: write_overlap_table(overlap_data)
