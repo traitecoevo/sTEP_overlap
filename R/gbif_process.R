@@ -12,8 +12,8 @@ get_cont_raster<-function(){
   unzip("cont.zip")
   #Load it
   cont.shp <- readShapeSpatial("continent.shp")
-  worldclim<-getData('worldclim', var='tmean', res=2.5)
-  worldclim10<-getData('worldclim', var='tmean', res=10)
+  worldclim<-raster::getData('worldclim', var='tmin', res=2.5)
+  worldclim10<-raster::getData('worldclim', var='tmin', res=10)
   
   cont.raster<-rasterize(cont.shp,worldclim,field="CONTINENT")
   writeRaster(cont.raster,"cont2.5.grd")
@@ -237,17 +237,17 @@ get_endemics<-function(){
   write_csv(one.cont.list,"one_cont_list.csv")
 }
 
-check_endemics<-function(){
-  one.cont.list<-read_csv("one_cont_list.csv")
-  genbank.scrubbed<-get_genbank()
-  one.cont.list$one.cont.list.genbank.yes.no<-one.cont.list$species%in%genbank.scrubbed
-  tt<-table(one.cont.list$cont,one.cont.list$one.cont.list.yes.no)
-  tt[,2]/(tt[,1]+tt[,2])
-  try_sp<-read_csv("TryAccSpecies.txt",col_names="AccSpeciesName")
-  try_sp$sp_scrubb<-scrub(try_sp$AccSpeciesName)
-  one.cont.list$try.yes.no<-one.cont.list$species%in%try_sp$sp_scrubb
-  tt<-table(one.cont.list$cont,one.cont.list$try.yes.no)
-  tt[,2]/(tt[,1]+tt[,2])
-  write_csv(one.cont.list,"one_cont_list.csv")
-}
+#check_endemics<-function(){
+#  one.cont.list<-read_csv("one_cont_list.csv")
+#  genbank.scrubbed<-get_genbank()
+#  one.cont.list$one.cont.list.genbank.yes.no<-one.cont.list$species%in%genbank.scrubbed
+  #tt<-table(one.cont.list$cont,one.cont.list$one.cont.list.yes.no)
+  #tt[,2]/(tt[,1]+tt[,2])
+#  try_sp<-read_csv("TryAccSpecies.txt",col_names="AccSpeciesName")
+#  try_sp$sp_scrubb<-try_sp$AccSpeciesName
+#  one.cont.list$try.yes.no<-one.cont.list$species%in%try_sp$sp_scrubb
+  #tt<-table(one.cont.list$cont,one.cont.list$try.yes.no)
+  #tt[,2]/(tt[,1]+tt[,2])
+#  write_csv(one.cont.list,"one_cont_list.csv")
+#}
 

@@ -194,9 +194,9 @@ do_big_list_family_anlysis<-function(){
   
 
 
-perform_endemic_analysis<-function(cont.number,db,one=one){
+perform_endemic_analysis<-function(cont_name,db,one=one){
   one.p<-filter(one,!is.na(cont))
-  out<-prepare.sampling.df(db,one.p$species[one.p$cont==cont.number])
+  out<-prepare.sampling.df(db,one.p$species[one.p$cont_name==cont_name])
   
   if(sum(out$in.list)==0){
     return(NA)
@@ -210,24 +210,30 @@ perform_endemic_analysis<-function(cont.number,db,one=one){
   prop<-unlist(lapply(test,function(x)x$observed[2,2]/sum(x$observed[,2])))
   sr<-unlist(lapply(test,function(x)sum(x$observed[,2])))
   
-  data_frame(family=unlist(family.list),prop.sampled=prop,sr=sr,g=g,p=p)%>%
+  data_frame(family=unlist(family.list),prop.sampled=prop,sr=sr,g=g,p=p,cont_name=cont_name,
+  db=db)%>%
     arrange(g)->ranking 
-  under<-filter(ranking,prop.sampled<0.2)
+  under<-filter(ranking,prop.sampled<0.3) # hack here to get undersampled only
   under<-arrange(under,desc(g))
-  return(under[1:2,])
+  return(under[1:3,])
 }
 
 do.endemic.analysis<-function(){
   one<-read_csv("one_cont_list.csv")
-  try.sp<-read.in.try()
-  genbank<-read.genBank()
-  try_by_cont<-mclapply(as.list(unique(one$cont)),perform_endemic_analysis,db=try.sp,one=one)
-  gb_by_cont<-mclapply(as.list(unique(one$cont)),perform_endemic_analysis,db=genbank,one=one)
-  helper<-c(1,1,2,2,3,4,4,5,5,6,6,7,7,8,8,9)
-    sum.df<-data_frame(con=rep(helper,2),family=c(unlist(lapply(try_by_cont,function(x)x[1])),unlist(lapply(gb_by_cont,function(x)x[1]))),db=c(rep(("try"),16),rep("genbank",16)))
+  try.sp<-firstup(read.in.try())
+  genbank<-firstup(read.genBank())
+  one<-filter(one,!is.na(cont))
+  one<-filter(one,cont!=2)
+  one$cont_name<-as.character(one$cont)
+  one$cont_name<-recode(one$cont_name, "1" = "Africa","3"="Asia","4"="Australia","5"="Europe",
+                                        "6" = "N. America", "7"="NZ and Oceania","8"="S.America")
+
+  try_by_cont<-mclapply(as.list(unique(one$cont_name)),perform_endemic_analysis,db=try.sp,one=one)
+  gb_by_cont<-mclapply(as.list(unique(one$cont_name)),perform_endemic_analysis,db=genbank,one=one)
+
+  sum.df<-bind_rows(try_by_cont,gb_by_cont)
 
     write_csv(sum.df,"tables/summary_of_endemic_analysis.csv")
-  print(xtable(sum.df,caption="this is a caption"),file="tables/summary_of_endemic_analysis.tex",booktabs=TRUE,floating=FALSE,caption.placement="top")
     return(sum.df)
 }
 

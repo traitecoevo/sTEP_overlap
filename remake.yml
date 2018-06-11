@@ -26,6 +26,7 @@ targets:
       - figures/order_phy.pdf
       - tables/two_and_three_way_comparisons.csv
       - tables/all_families_ranking.tex
+      - tables/summary_of_endemic_analysis.csv
 
 
   gam_df:
@@ -45,3 +46,6 @@ targets:
 
   tables/all_families_ranking.tex:
     command: do_big_list_family_anlysis()
+
+  tables/summary_of_endemic_analysis.csv:
+    command: do.endemic.analysis()
