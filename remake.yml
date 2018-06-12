@@ -29,11 +29,8 @@ targets:
       - tables/summary_of_endemic_analysis.csv
 
 
-  gam_df:
-    command: run_gam_df()
-  
   figures/multi_gam.png:
-    command: plot_gbif_bins(gam_df)
+    command: run_gam_df()
     
   figures/order_phy.pdf:
     command: makephylo()
