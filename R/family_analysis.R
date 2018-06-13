@@ -182,7 +182,7 @@ do_big_list_family_anlysis<-function(){
   gb_sp<-unique(a$species)
   rm(a)
   gc()
-  gb_sp<-use.synonym.lookup(scrub(gb_sp))
+  #gb_sp<-use.synonym.lookup(scrub(gb_sp))
   t_gbif<-run_family_analysis(gb_sp)
   write_csv(t_gbif,"tables/gbif_families_ranking.csv")
   t_all<-rbind(t_try,t_gb,t_gbif)
