@@ -192,7 +192,7 @@ do_big_list_family_anlysis<-function(){
  
   t_all<-rbind(t_try,t_gb,t_gbif,ws_out)
   t_all$prop.sampled<-round(t_all$prop.sampled,4)
-  t_all$db<-c(rep("try",10),rep("genbank",10),rep("gbif",10),rep("well_studied",10))
+  t_all$db<-c(rep("try",20),rep("genbank",20),rep("gbif",20),rep("well_studied",20))
   write_csv(t_all,"tables/all_families_ranking.csv")
   #print(xtable(t_all,caption="this is a caption"),file="tables/all_families_ranking.tex",booktabs=TRUE,floating=FALSE,caption.placement="top")
 }

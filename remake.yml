@@ -25,7 +25,7 @@ targets:
       - figures/multi_gam.png
       - figures/order_phy.pdf
       - tables/two_and_three_way_comparisons.csv
-      - tables/all_families_ranking.tex
+      - tables/all_families_ranking.csv
       - tables/summary_of_endemic_analysis.csv
 
 
@@ -41,7 +41,7 @@ targets:
   tables/two_and_three_way_comparisons.tex:
     command: write_overlap_table(overlap_data)
 
-  tables/all_families_ranking.tex:
+  tables/all_families_ranking.csv:
     command: do_big_list_family_anlysis()
 
   tables/summary_of_endemic_analysis.csv:
