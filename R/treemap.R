@@ -93,14 +93,17 @@ makephylo<-function(){
     summarise(prop.sampled=mean(in.list))%>%
     filter(!is.na(order))->gen.sampled.df
   
-gbif<-unique(get_gbif())
-  gbif_out<-sync.species.lists(firstup(gbif))
+gbif<-get_gbif()
+gbif_sp<-unique(gbif$species)
+rm(gbif)
+gc()
+  gbif_out<-sync.species.lists(firstup(gbif_sp))
   group_by(gbif_out,order)%>%
     summarise(prop.sampled=mean(in.list))%>%
     filter(!is.na(order))->gbif.sampled.df
 
 
-well_studied<-gbif_out[gbif%in%t_gen&gbif%in%t_try$AccSpeciesName]
+well_studied<-gbif_sp[gbif_sp%in%t_gen&gbif_sp%in%t_try$AccSpeciesName]
 well_studied_out<-sync.species.lists(firstup(well_studied))
   group_by(well_studied_out,order)%>%
     summarise(prop.sampled=mean(in.list))%>%
