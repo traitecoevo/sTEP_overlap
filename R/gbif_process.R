@@ -144,13 +144,11 @@ run_gam_df<-function(){
   #stick data frame together
   out<-rbind(gam.df.obs,gam.df.sp)
   ss<-out[sample(1:dim(out)[1],1*10^6,replace=F),]
-  png("figures/multi_gam.png",width=8.5,height=5)
-  print(ggplot(ss,aes(x=lat,y=fit))+
+  ggplot(ss,aes(x=lat,y=fit))+
           ylab("Proportion in database")+
           geom_line(aes(col=dataset,linetype=type))+
-        theme_classic())
-  dev.off()
-  return(out)
+        theme_classic()
+  ggsave("figures/multi_gam.png",width=8.5,height=5)
 }
 
 plot_gbif_bins<-function(out){
