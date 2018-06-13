@@ -174,9 +174,11 @@ run_family_analysis<-function(db_list){
 }
 
 do_big_list_family_anlysis<-function(){
-  t_try<-run_family_analysis(read.in.try())
+  try_sp<-read.in.try()
+  t_try<-run_family_analysis(try_sp)
   write_csv(t_try,"tables/try_families_ranking.csv")
-  t_gb<-run_family_analysis(read.genBank())
+  genb_sp<-read.genBank()
+  t_gb<-run_family_analysis(genb_sp)
   write_csv(t_gb,"tables/genbank_families_ranking.csv")
   a<-get_gbif()
   gb_sp<-unique(a$species)
@@ -185,11 +187,14 @@ do_big_list_family_anlysis<-function(){
   #gb_sp<-use.synonym.lookup(scrub(gb_sp))
   t_gbif<-run_family_analysis(gb_sp)
   write_csv(t_gbif,"tables/gbif_families_ranking.csv")
-  t_all<-rbind(t_try,t_gb,t_gbif)
+  well_studied_sp <- gb_sp[gb_sp%in%try_sp & gb_sp %in% genb_sp]
+  ws_out<-run_family_analysis(well_studied_sp)
+ 
+  t_all<-rbind(t_try,t_gb,t_gbif,ws_out)
   t_all$prop.sampled<-round(t_all$prop.sampled,4)
-  t_all$db<-c(rep("try",10),rep("genbank",10),rep("gbif",10))
-  #write_csv(t_all,"tables/all_families_ranking.csv")
-  print(xtable(t_all,caption="this is a caption"),file="tables/all_families_ranking.tex",booktabs=TRUE,floating=FALSE,caption.placement="top")
+  t_all$db<-c(rep("try",10),rep("genbank",10),rep("gbif",10),rep("well_studied",10))
+  write_csv(t_all,"tables/all_families_ranking.csv")
+  #print(xtable(t_all,caption="this is a caption"),file="tables/all_families_ranking.tex",booktabs=TRUE,floating=FALSE,caption.placement="top")
 }
   
 
