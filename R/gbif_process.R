@@ -1,22 +1,15 @@
-
+# Libraries
+library(sp)
+library(maptools)
+library(raster)
 
 get_cont_raster<-function(){
-  library(sp) #Load your libraries
-  library(maptools)
-  library(raster)
-  #Download the continents shapefile
-  download.file("http://faculty.baruch.cuny.edu/geoportal/data/esri/world/continent.zip",
-                "cont.zip")
-  
-  #Unzip it
-  unzip("cont.zip")
-  #Load it
-  cont.shp <- readShapeSpatial("continent.shp")
+  cont.shp <- readShapeSpatial("../raw_data/continent.shp")
   worldclim<-raster::getData('worldclim', var='tmin', res=2.5)
   worldclim10<-raster::getData('worldclim', var='tmin', res=10)
   
   cont.raster<-rasterize(cont.shp,worldclim,field="CONTINENT")
-  writeRaster(cont.raster,"cont2.5.grd")
+  writeRaster(cont.raster,"../clean_data/cont2.5.grd")
 }
 
 gbif_tpl<-function(gbif){
@@ -31,7 +24,7 @@ gbif_tpl<-function(gbif){
 
 get_gbif<-function(){
   if (Sys.info()[[1]]=="Linux") a<-fread("../../../srv/scratch/z3484779/overlap-data/raw_data/cooked.csv")
-  else a<-fread("occur.csv")
+  else a<-fread("../clean_data/gbif_spp_clean.csv")
   names(a)<-c("species","lat","long")
   read_csv("../../../srv/scratch/z3484779/taxonomicResources//plantList11syns.csv")%>%
     dplyr::select(correct.names)%>%
@@ -43,7 +36,7 @@ get_gbif<-function(){
 }
 
 get_genbank<-function(){
-  genbank<-read.csv("genBankList.txt",header=FALSE,as.is=TRUE)
+  genbank<-read.csv("../clean_data/genbank_spp_clean.txt",header=FALSE,as.is=TRUE)
   genbank.scrubbed<-tolower(genbank$V1)
   out<-genbank.scrubbed[!is.na(genbank.scrubbed)]
   return(out)
@@ -184,7 +177,7 @@ mean_gbif<-function(a){
 
 add_continent<-function(){
   #NOT WORKING YET
-  cont<-raster("cont2.5.grd")
+  cont<-raster("../clean_data/cont2.5.grd")
   if (Sys.info()[[1]]=="Linux") a<-fread("../../../srv/scratch/z3484779/gbif/gbif_cleaner.csv")
   else a<-fread("occur.csv")
   sp<-SpatialPoints(cbind(as.numeric(a$long),as.numeric(a$lat)))
@@ -196,7 +189,7 @@ add_continent<-function(){
 
 other_stuff<-function(){
   #get_cont_raster()
-  cont<-raster("cont2.5.grd")
+  cont<-raster("../clean_data/cont2.5.grd")
   #a<-filter(a,!is.na(as.numeric(decimalLongitude)))
   a$in.genbank<-a$species%in%genbank
   a$in.try<-a$species%in%try.sp

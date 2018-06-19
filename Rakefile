@@ -78,23 +78,20 @@ task :dwn_gbif => "raw_data/gbif_cut.txt"
 # GIS layers
 def dwn_gis
   Dir.chdir("raw_data") do 
-    `wget http://legacy.jefferson.kctcs.edu/techcenter/gis%20data/World/Zip/Continents.zip`
-    `unzip Continents.zip`
-    File.delete("Continents.zip")
+    `wget http://faculty.baruch.cuny.edu/geoportal/data/esri/world/continent.zip`
+    `unzip continent.zip`
+    File.delete("continent.zip")
   end
 end
-file 'raw_data/continent.avl' do dwn_gis end
 file 'raw_data/continent.dbf' do dwn_gis end
-file 'raw_data/continent.htm' do dwn_gis end
 file 'raw_data/continent.prj' do dwn_gis end
 file 'raw_data/continent.sbn' do dwn_gis end
+file 'raw_data/continent.sbx' do dwn_gis end
 file 'raw_data/continent.shp' do dwn_gis end
 file 'raw_data/continent.shp.xml' do dwn_gis end
 file 'raw_data/continent.shx' do dwn_gis end
-file 'raw_data/Continents.lyr' do dwn_gis end
-file 'raw_data/Continents.lyr.xml' do dwn_gis end
 desc "Download GIS data"
-task :dwn_gis => ["raw_data/continent.avl","raw_data/continent.dbf","raw_data/continent.htm","raw_data/continent.prj","raw_data/continent.sbn","raw_data/continent.shp","raw_data/continent.shp.xml","raw_data/continent.shx","raw_data/Continents.lyr","raw_data/Continents.lyr.xml"]
+task :dwn_gis => ["raw_data/continent.dbf","raw_data/continent.prj","raw_data/continent.sbn","raw_data/continent.sbx","raw_data/continent.shp","raw_data/continent.shp.xml","raw_data/continent.shx"]
 
 ################################
 # Taxonomy cleaning ############
