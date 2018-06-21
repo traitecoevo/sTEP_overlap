@@ -2,7 +2,7 @@ pacman::p_load(dplyr, raster,data.table,maptools,ape,readr,ggplot2,taxonlookup, 
 
 get_good_names<-function(){
   require(dplyr)
-  syn<-read.delim("taxonomicResources//TPL1.1_synonymy_list",sep = "\t",header = FALSE,as.is=T,nrows=350699)
+  syn<-read.delim("raw_data/tpl_names.txt",sep = "\t",header = FALSE,as.is=T,nrows=350699)
   good.names<-sapply(as.character(syn$V1),FUN=function(x) strsplit(x,",")[[1]][1],USE.NAMES=F)
   good.names<-sub("_"," ",good.names)
   return(unique(good.names))
@@ -76,7 +76,7 @@ add.family.order<-function(gf){
 
 plant.list.subset<-function(df){
   require(dplyr)
-  syn<-read.delim("taxonomicResources//TPL1.1_synonymy_list",sep = "\t",header = FALSE,as.is=T,nrows=350699)
+  syn<-read.delim("raw_data/tpl_names.txt",sep = "\t",header = FALSE,as.is=T,nrows=350699)
   good.names<-sapply(as.character(syn$V1),FUN=function(x) strsplit(x,",")[[1]][1],USE.NAMES=F)
   good.names<-sub("_"," ",good.names)
   out<-filter(df,sp%in%good.names)
@@ -87,7 +87,7 @@ use.synonym.lookup<-function(orig.names){
   orig.names<-sub(" ","_",orig.names)
   #names(lookup)<-c("correct.names","all.names")
   #write.csv(lookup,"taxonomicResources//plantList11syns.csv",row.names=FALSE,quote=F)
-  lookup<-read_csv("../../../srv/scratch/z3484779/taxonomicResources//plantList11syns.csv")
+  lookup<-read_csv("raw_data/tpl_names.txt")
   out.sp<-orig.names
   matched.spp<-lookup$correct.names[match(orig.names,lookup$all.names)]
   

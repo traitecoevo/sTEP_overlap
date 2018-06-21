@@ -1,6 +1,23 @@
 require 'rake'
 require 'set'
 require 'unidecoder'
+require 'csv'
+require 'os'
+
+# Wrapper for line splitting with hybrid problem
+def line_split(line, split="\t")
+  begin
+    line = line.to_ascii
+    line = line.split(split)
+  rescue ArgumentError
+    line = line.encode("UTF-8", "Windows-1252")
+    line.sub!("\u00D7", "x ")
+    line.sub!("x  ", "x ")
+    line = line.to_ascii
+    line = line.split(split)
+  end
+  return line
+end
 
 task :default => [:build]
 
@@ -19,7 +36,7 @@ CLEAN.include("clean_data/*")
 ################################
 # Wrapper
 desc "Download all raw data"
-task :download => [:dwn_setup, :dwn_genbank, :dwn_try, :dwn_gbif]
+task :download => [:dwn_setup, :dwn_tpl, :dwn_try, :dwn_genbank, :dwn_gbif]
 
 # Setup
 desc "Download setup"
@@ -36,12 +53,8 @@ def dwn_genbank
     File.delete("taxdump.tar.gz")
   end
 end
-file 'raw_data/names.dmp' do
-  dwn_genbank
-end
-file 'raw_data/nodes.dmp' do
-  dwn_genbank
-end
+file 'raw_data/names.dmp' do dwn_genbank end
+file 'raw_data/nodes.dmp' do dwn_genbank end
 desc "Download GenBank data"
 task :dwn_genbank => ["raw_data/names.dmp", "raw_data/nodes.dmp"]
 
@@ -93,12 +106,27 @@ file 'raw_data/continent.shx' do dwn_gis end
 desc "Download GIS data"
 task :dwn_gis => ["raw_data/continent.dbf","raw_data/continent.prj","raw_data/continent.sbn","raw_data/continent.sbx","raw_data/continent.shp","raw_data/continent.shp.xml","raw_data/continent.shx"]
 
+# TPL species lists
+file 'raw_data/tpl_names.txt' do
+  Dir.chdir("raw_data") do 
+    `wget https://raw.githubusercontent.com/schwilklab/taxon-name-utils/master/data/theplantlist1.1/names_unique.csv`
+    File.rename("names_unique.csv", "tpl_names.txt")
+    if OS.linux?
+      `tr '\r' '\n' < tpl_names.txt > tmp.txt`
+      `mv tmp.txt tpl_names.txt`
+    end
+  end
+end
+desc "Download The Plant List accepted names"
+task :dwn_tpl => "raw_data/tpl_names.txt"
+
+
 ################################
 # Taxonomy cleaning ############
 ################################
 # Wrapper
 desc "Harmonise all raw data"
-task :harmonise => [:hrm_setup, :hrm_genbank, :hrm_try, :hrm_gbif]  
+task :harmonise => [:hrm_setup, :hrm_genbank, :hrm_try, :hrm_gbif]
 
 # Setup
 desc "Clean GBIF data"
@@ -107,25 +135,48 @@ task :hrm_setup do
 end
 
 # GBIF
-file 'clean_data/gbif_spp_clean.txt' do
-  puts "GBIF doesn't have authors etc. cut so this isn't perfect"
+def hrm_gbif
   Dir.chdir("raw_data") do
-    all_spp = Set.new
-    File.open("gbif_cut.txt", "r") do |file|
+    # Build TPL set
+    tpl = Set.new
+    File.open("tpl_names.txt") do |file|
       file.each_with_index do |line, i|
         if i == 0 then next end
-        line = line.to_ascii
-        line = line.split("\t")
-        species = line[0]
-        species.downcase!
-        all_spp.add species
+        sp = line_split(line, ",")[5]
+        sp = sp.sub("_", " ").downcase.chomp
+        tpl.add(sp)
       end
     end
-    File.open("../clean_data/gbif_spp_clean.txt", "w") {|file| all_spp.each {|x| file << "#{x}\n"}}
+    # Parse GBIF data
+    all_spp = Set.new
+    File.open("gbif_cut.txt", "r") do |file|
+      File.open("../clean_data/gbif_tpl_locations.txt", "w") do |spp_tpl|
+        file.each_with_index do |line, i|
+          # First handle file loading (can't use CSV because of encoding)
+          if i == 0 then next end
+          if i < 10000 then next end
+          line = line_split(line)
+          # Make species set
+          species = line[0]
+          species.downcase!
+          all_spp.add species
+          # Make TPL-checked lats and longs (as we go along)
+          species = species.split(" ")[0..1].join " "
+          if tpl.include? species
+            line[0] = species
+            spp_tpl << line.join("\t")
+          end
+        end
+      end
+    end
+    # Write out all GBIF species (at the end, from the set)
+    File.open("../clean_data/gbif_spp.txt", "w") {|file| all_spp.each {|x| file << "#{x}\n"}}
   end
 end
+file 'clean_data/gbif_spp.txt' do hrm_gbif end
+file 'clean_data/gbif_tpl_locations.txt' do hrm_gbif end
 desc "Clean GBIF data"
-task :hrm_gbif => "clean_data/gbif_spp_clean.txt"
+task :hrm_gbif => ["clean_data/gbif_spp.txt", "clean_data/gbif_tpl_locations.txt"]
 
 # TRY
 file 'clean_data/try_spp_clean.txt' do
@@ -135,17 +186,7 @@ file 'clean_data/try_spp_clean.txt' do
     File.open("TryAccSpecies.txt", "r") do |file|
       file.each_with_index do |line, i|
         if i == 0 then next end
-        # The blasted hybrid sign
-        begin
-          line = line.to_ascii
-          line = line.split "\t"
-        rescue ArgumentError
-          line = line.encode("UTF-8", "Windows-1252")
-          line = line.sub("\u00D7", "x ")
-          line.sub("x  ", "x ")
-          line = line.to_ascii
-          line = line.split "\t"          
-        end
+        line = line_split(line)
         species = line[1].gsub('"', "")
         species.downcase!
         species = species.split(" ")[0..1].join(" ")
@@ -175,3 +216,31 @@ file 'clean_data/genbank_spp_clean.txt' do
 end
 desc "Clean GenBank data"
 task :hrm_genbank => "clean_data/genbank_spp_clean.txt"
+
+################################
+# Analysis #####################
+################################
+# Wrapper
+desc "Run analyses"
+task :analysis => [:analysis_setup, 'figures/multi_gam.png', 'figures/order_phy.pdf', 'figures/multi_gam.png', 'tables/two_and_three_way_comparisons.tex', 'tables/all_families_ranking.csv', 'tables/summary_of_endemic_analysis.csv', :analysis_folder]
+
+# Setup
+desc "Install R packages"
+task :analysis_setup do
+  `Rscript R/install.R`
+  unless File.directory?("output") then Dir.mkdir("output") end
+  unless File.directory?("overlap_data") then Dir.mkdir("overlap_data") end
+  unless File.directory?("tables") then Dir.mkdir("tables") end
+  unless File.directory?("figures") then Dir.mkdir("figures") end
+end
+
+# Getting Things Done
+file 'figures/multi_gam.png' do `Rscript -e "source('R/install.R)'; run_gam_df()"` end
+file 'figures/order_phy.pdf' do `Rscript -e "source('R/install.R)'; makephylo()"` end
+file 'figures/multi_gam.png' do `Rscript -e "source('R/install.R'); multi_gam()"` end
+file 'tables/two_and_three_way_comparisons.tex' do `Rscript -e "source(R/install.R); write_overlap_table(overlap_data)"` end
+file 'tables/all_families_ranking.csv' do `Rscript -e "source('R/install.R'); do_big_list_family_anlysis()")` end
+file 'tables/summary_of_endemic_analysis.csv' do `Rscript -e "source('R/install.R'); do.endemic.analysis()"` end
+task :analysis_folder do
+  `Rscript -e "source('R/install.R'); do_overlap_analysis()"`
+end

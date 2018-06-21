@@ -65,7 +65,7 @@ likelihood.test<-function (x, y = NULL, conservative = FALSE)
 
 
 sync.species.lists<-function(sampled.list){
-  read_csv("../../../srv/scratch/z3484779/taxonomicResources//plantList11syns.csv")%>%
+  read_csv("raw_data/tpl_names.txt")%>%
     dplyr::select(correct.names)%>%
     mutate(correct.names=gsub("_", " ", correct.names))->goodNames
   goodNames<-data.frame(gs=unique(goodNames$correct.names),stringsAsFactors=FALSE)
@@ -124,7 +124,7 @@ process.endemic.list<-function(sp.names){
 
 read.genBank<-function(){
   # this is the genbank species list from the NCBI Browser website
-  read.delim("genBankList.txt",header=FALSE,as.is=T)%>%
+  read.delim("genbank_spp_clean.txt",header=FALSE,as.is=T)%>%
     mutate(V3=use.synonym.lookup(V1))->genbank.all
   genbank<-unique(genbank.all$V3)
   return(genbank)
