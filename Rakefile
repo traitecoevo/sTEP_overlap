@@ -79,7 +79,7 @@ file "raw_data/gbif_cut.txt", [:location] do |task, args|
     end
     file_stem = location[/[0-9\\-]{10,}/]
     `wget #{location}`
-    `unzip #{file_stem}.zip`
+    `7z e #{file_stem}.zip`
     `cut -f13,17,18,28 #{file_stem}.csv > gbif_cut.txt`
     File.delete("#{file_stem}.zip")
     File.delete("#{file_stem}.csv")
@@ -92,7 +92,7 @@ task :dwn_gbif => "raw_data/gbif_cut.txt"
 def dwn_gis
   Dir.chdir("raw_data") do 
     `wget http://faculty.baruch.cuny.edu/geoportal/data/esri/world/continent.zip`
-    `unzip continent.zip`
+    `7z e continent.zip`
     File.delete("continent.zip")
   end
 end
