@@ -2,7 +2,7 @@
 
 make_treemaps<-function(y){
   
-  lookup <- read_csv("../../../srv/scratch/z3484779/taxonomicResources//plantList11syns.csv")
+  lookup <- read_csv("raw_data/tpl_names.txt")
   out <- sub("_"," ",unique(lookup$correct.names))
   lt<-lookup_table(out,by_species = TRUE)
   lt$species<-row.names(lt)
@@ -32,7 +32,7 @@ make_treemaps<-function(y){
 
 make_well_known_treemap<-function(y){
 
-  lookup <- read_csv("../../../srv/scratch/z3484779/taxonomicResources//plantList11syns.csv")
+  lookup <- read_csv("raw_data/tpl_names.txt")
   out <- sub("_"," ",unique(lookup$correct.names))
   lt<-lookup_table(out,by_species = TRUE)
   lt$species<-row.names(lt)
@@ -73,14 +73,15 @@ make_well_known_treemap<-function(y){
   dev.off()
   
 }
+# You don't need to clean/downcase this now
 read.in.try<-function(){
-t_try<-read_csv("TryAccSpecies.txt",col_names="AccSpeciesName")
-return(tolower(t_try$AccSpeciesName))
+try_sp<-read.csv("clean_data/try_spp_clean.txt", header=FALSE, as.is=TRUE)[,1]
+return(tolower(t_try))
 }
 
 makephylo<-function(){
-  t_try<-read_csv("TryAccSpecies.txt",col_names="AccSpeciesName")
-  try_out<-sync.species.lists(firstup(t_try$AccSpeciesName))
+  t_try<-read.csv("clean_data/try_spp_clean.txt", header=FALSE, as.is=TRUE)[,1]
+  try_out<-sync.species.lists(firstup(t_try))
   tree<-readRDS("phy/phy.o.rds")
   group_by(try_out,order)%>%
     summarise(prop.sampled=mean(in.list))%>%
@@ -103,7 +104,7 @@ gc()
     filter(!is.na(order))->gbif.sampled.df
 
 
-well_studied<-gbif_sp[gbif_sp%in%t_gen&gbif_sp%in%t_try$AccSpeciesName]
+well_studied<-gbif_sp[gbif_sp%in%t_gen&gbif_sp%in%t_try]
 well_studied_out<-sync.species.lists(firstup(well_studied))
   group_by(well_studied_out,order)%>%
     summarise(prop.sampled=mean(in.list))%>%

@@ -55,7 +55,7 @@ calculate.overlap <- function(y, i){
 
 
 do_overlap_analysis<-function(){
-  lookup <- read_csv("../../../srv/scratch/z3484779/taxonomicResources//plantList11syns.csv")
+  lookup <- read_csv("raw_data/tpl_names.txt")
   tpl_names <- unique(sub("_"," ",lookup$correct.names))
   gbif<-get_gbif_names()
   try_names<-read.in.try()

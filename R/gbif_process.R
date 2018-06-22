@@ -1,26 +1,19 @@
-
+# Libraries
+library(sp)
+library(maptools)
+library(raster)
 
 get_cont_raster<-function(){
-  library(sp) #Load your libraries
-  library(maptools)
-  library(raster)
-  #Download the continents shapefile
-  download.file("http://faculty.baruch.cuny.edu/geoportal/data/esri/world/continent.zip",
-                "cont.zip")
-  
-  #Unzip it
-  unzip("cont.zip")
-  #Load it
-  cont.shp <- readShapeSpatial("continent.shp")
+  cont.shp <- readShapeSpatial("raw_data/continent.shp")
   worldclim<-raster::getData('worldclim', var='tmin', res=2.5)
   worldclim10<-raster::getData('worldclim', var='tmin', res=10)
   
   cont.raster<-rasterize(cont.shp,worldclim,field="CONTINENT")
-  writeRaster(cont.raster,"cont2.5.grd")
+  writeRaster(cont.raster,"clean_data/cont2.5.grd")
 }
 
 gbif_tpl<-function(gbif){
-  syns<-fread("../../../srv/scratch/z3484779/taxonomicResources/plantList11syns.csv")
+  syns<-fread("raw_data/tpl_names.txt")
   syns$correct.names<-sub("_"," ",syns$correct.names)
   syns$all.names<-sub("_"," ",syns$all.names)
   gbif$corrected.name<-syns$correct.names[match(gbif$species,syns$all.names)]
@@ -30,10 +23,9 @@ gbif_tpl<-function(gbif){
 }
 
 get_gbif<-function(){
-  if (Sys.info()[[1]]=="Linux") a<-fread("../../../srv/scratch/z3484779/overlap-data/raw_data/cooked.csv")
-  else a<-fread("occur.csv")
+  a <- fread("clean_data/gbif_tpl_locations.csv")
   names(a)<-c("species","lat","long")
-  read_csv("../../../srv/scratch/z3484779/taxonomicResources//plantList11syns.csv")%>%
+  read_csv("raw_data/tpl_names.txt")%>%
     dplyr::select(correct.names)%>%
     mutate(correct.names=tolower(gsub("_", " ", correct.names)))->goodNames
     accNames<-unique(goodNames$correct.names)
@@ -43,7 +35,7 @@ get_gbif<-function(){
 }
 
 get_genbank<-function(){
-  genbank<-read.csv("genBankList.txt",header=FALSE,as.is=TRUE)
+  genbank<-read.csv("clean_data/genbank_spp_clean.txt",header=FALSE,as.is=TRUE)
   genbank.scrubbed<-tolower(genbank$V1)
   out<-genbank.scrubbed[!is.na(genbank.scrubbed)]
   return(out)
@@ -68,12 +60,12 @@ do.gam.analysis<-function(b,type){
   b$genbank.yes.no<-b$species%in%genbank.scrubbed
   ou<-makeCluster(15,type="SOCK")
   gam.genbank<-bam(genbank.yes.no~s(lat),family=binomial(),data=b,cluster=ou,gc.level=2)
-  try_sp<-read_csv("TryAccSpecies.txt",col_names="AccSpeciesName")
-  #try_sp$sp_scrubb<-scrub(try_sp$AccSpeciesName)
-  b$try.yes.no<-b$species%in%tolower(try_sp$AccSpeciesName)
+  try_sp<-read.csv("clean_data/try_spp_clean.txt", header=FALSE, as.is=TRUE)[,1]
+  #try_sp$sp_scrubb<-scrub(try_sp)
+  b$try.yes.no<-b$species%in%tolower(try_sp)
   out_try<-bam(try.yes.no~s(lat),family=binomial(),data=b,cluster=ou,gc.level=2)
  
-  b$try.genbank.yes.no<-b$species%in%tolower(try_sp$AccSpeciesName)&
+  b$try.genbank.yes.no<-b$species%in%tolower(try_sp)&
                         b$species%in%genbank.scrubbed
  
    gam_try_plus_genbank<-bam(try.genbank.yes.no~s(lat),family=binomial(),data=b,cluster=ou,gc.level=2)
@@ -96,11 +88,11 @@ plot_gbif_sampling<-function(){
    genbank.scrubbed<-get_genbank()
   b$genbank.yes.no<-b$species%in%genbank.scrubbed
   ou<-makeCluster(15,type="SOCK")
-  try_sp<-read_csv("TryAccSpecies.txt",col_names="AccSpeciesName")
-  #try_sp$sp_scrubb<-scrub(try_sp$AccSpeciesName)
-  b$try.yes.no<-b$species%in%tolower(try_sp$AccSpeciesName)
+  try_sp<-read.csv("clean_data/try_spp_clean.txt", header=FALSE, as.is=TRUE)[,1]
+  #try_sp$sp_scrubb<-scrub(try_sp)
+  b$try.yes.no<-b$species%in%tolower(try_sp)
  
-  b$try.genbank.yes.no<-b$species%in%tolower(try_sp$AccSpeciesName)&
+  b$try.genbank.yes.no<-b$species%in%tolower(try_sp)&
                         b$species%in%genbank.scrubbed
   group_by(b,species)%>%
   summarize(number_of_gbif_obs=n(),try_presence=mean(try.yes.no),genbank_presence=mean(genbank.yes.no))->z
@@ -184,19 +176,18 @@ mean_gbif<-function(a){
 
 add_continent<-function(){
   #NOT WORKING YET
-  cont<-raster("cont2.5.grd")
-  if (Sys.info()[[1]]=="Linux") a<-fread("../../../srv/scratch/z3484779/gbif/gbif_cleaner.csv")
-  else a<-fread("occur.csv")
+  cont<-raster("clean_data/cont2.5.grd")
+  a <- fread("clean_data/gbif_tpl_locations.txt")
   sp<-SpatialPoints(cbind(as.numeric(a$long),as.numeric(a$lat)))
   cont.x<-extract(cont,sp)
   a$cont<-cont.x
-  write_csv(a,"../../../srv/scratch/z3484779/gbif/gbif_cleaner_geo_data.csv")
+  write_csv(a,"clean_data/gbif_cleaner_geo_data.csv")
   return(table(a$cont))
 }
 
 other_stuff<-function(){
   #get_cont_raster()
-  cont<-raster("cont2.5.grd")
+  cont<-raster("clean_data/cont2.5.grd")
   #a<-filter(a,!is.na(as.numeric(decimalLongitude)))
   a$in.genbank<-a$species%in%genbank
   a$in.try<-a$species%in%try.sp
@@ -224,7 +215,7 @@ other_stuff<-function(){
 }
   
 get_endemics<-function(){
-  a<-read_csv("../../../srv/scratch/z3484779/gbif/gbif_cleaner_geo_data.csv")
+  a<-read_csv("clean_data/gbif_tpl_locations.txt")
   endemic<-summarize(group_by(a,species),num.cont=length(unique(cont)))
   table(endemic$num.cont)
   one.cont.endemics<-filter(endemic,num.cont==1)
@@ -249,7 +240,7 @@ get_endemics<-function(){
   #tt<-table(one.cont.list$cont,one.cont.list$one.cont.list.yes.no)
   #tt[,2]/(tt[,1]+tt[,2])
 #  try_sp<-read_csv("TryAccSpecies.txt",col_names="AccSpeciesName")
-#  try_sp$sp_scrubb<-try_sp$AccSpeciesName
+#  try_sp$sp_scrubb<-try_sp
 #  one.cont.list$try.yes.no<-one.cont.list$species%in%try_sp$sp_scrubb
   #tt<-table(one.cont.list$cont,one.cont.list$try.yes.no)
   #tt[,2]/(tt[,1]+tt[,2])
