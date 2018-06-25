@@ -154,29 +154,25 @@ def hrm_gbif
         file.each_with_index do |line, i|
           # First handle file loading (can't use CSV because of encoding)
           if i == 0 then next end
-          if i < 10000 then next end
           line = line_split(line)
           # Make species set
           species = line[0]
           species.downcase!
           all_spp.add species
-          # Make TPL-checked lats and longs (as we go along)
-          species = species.split(" ")[0..1].join " "
-          if tpl.include? species
-            line[0] = species
-            spp_tpl << line.join("\t")
-          end
         end
       end
     end
-    # Write out all GBIF species (at the end, from the set)
+    # Write out all GBIF species (pre-processing for fuzzy match)
     File.open("../clean_data/gbif_spp.txt", "w") {|file| all_spp.each {|x| file << "#{x}\n"}}
+    # Perform fuzzy match
+    `../src/synonymy_match.rb -t tpl_synonyms.txt -u ../clean_data/gbif_spp.txt -g gbif_cut.txt -o gbif_tpl_locations.txt -n 40 -c gbif_tpl_cache.txt`
   end
 end
 file 'clean_data/gbif_spp.txt' do hrm_gbif end
 file 'clean_data/gbif_tpl_locations.txt' do hrm_gbif end
+file 'raw_data/gbif_tpl_cache.txt' do hrm_gbif end
 desc "Clean GBIF data"
-task :hrm_gbif => ["clean_data/gbif_spp.txt", "clean_data/gbif_tpl_locations.txt"]
+task :hrm_gbif => ["clean_data/gbif_spp.txt", "clean_data/gbif_tpl_locations.txt", "raw_data/gbif_tpl_cache.txt"]
 
 # TRY
 file 'clean_data/try_spp_clean.txt' do
