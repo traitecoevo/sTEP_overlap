@@ -22,6 +22,19 @@ gbif_tpl<-function(gbif){
   return(gbif)
 }
 
+
+get_gbif_names<-function(){
+  a <- fread("clean_data/gbif_spp.txt")
+  names(a)<-c("species","lat","long")
+  read_csv("raw_data/tpl_names.txt")%>%
+    dplyr::select(correct.names)%>%
+    mutate(correct.names=tolower(gsub("_", " ", correct.names)))->goodNames
+    accNames<-unique(goodNames$correct.names)
+  b<-filter(a,species%in%accNames) 
+
+  return(b)
+}
+
 get_gbif<-function(){
   a <- fread("clean_data/gbif_tpl_locations.csv")
   names(a)<-c("species","lat","long")

@@ -66,9 +66,9 @@ likelihood.test<-function (x, y = NULL, conservative = FALSE)
 
 sync.species.lists<-function(sampled.list){
   read_csv("raw_data/tpl_names.txt")%>%
-    dplyr::select(correct.names)%>%
-    mutate(correct.names=gsub("_", " ", correct.names))->goodNames
-  goodNames<-data.frame(gs=unique(goodNames$correct.names),stringsAsFactors=FALSE)
+    dplyr::select(gs)%>%
+    mutate(gs=gsub("_", " ", gs))->goodNames
+  goodNames<-data.frame(gs=unique(goodNames$gs),stringsAsFactors=FALSE)
   goodNames$genera<-sapply(as.character(goodNames$gs),FUN=function(x) strsplit(x," ")[[1]][1],USE.NAMES=F)
   pl<-plant_lookup()
   goodNames$family<-pl$family[match(goodNames$genera,pl$genus)]

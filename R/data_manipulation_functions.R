@@ -2,8 +2,8 @@ pacman::p_load(dplyr, raster,data.table,maptools,ape,readr,ggplot2,taxonlookup, 
 
 get_good_names<-function(){
   require(dplyr)
-  syn<-read.delim("raw_data/tpl_names.txt",sep = "\t",header = FALSE,as.is=T,nrows=350699)
-  good.names<-sapply(as.character(syn$V1),FUN=function(x) strsplit(x,",")[[1]][1],USE.NAMES=F)
+  syn<-read_csv("raw_data/tpl_names.txt")
+  good.names<-syn$gs
   good.names<-sub("_"," ",good.names)
   return(unique(good.names))
 }
