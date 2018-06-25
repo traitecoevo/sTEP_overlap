@@ -79,7 +79,7 @@ file "raw_data/gbif_cut.txt", [:location] do |task, args|
     end
     file_stem = location[/[0-9\\-]{10,}/]
     `wget #{location}`
-    `unzip #{file_stem}.zip`
+    `7z e #{file_stem}.zip`
     `cut -f13,17,18,28 #{file_stem}.csv > gbif_cut.txt`
     File.delete("#{file_stem}.zip")
     File.delete("#{file_stem}.csv")
@@ -202,7 +202,7 @@ task :hrm_try => "clean_data/try_spp_clean.txt"
 # GenBank
 file 'clean_data/genbank_spp_clean.txt' do
   Dir.chdir("raw_data") do
-    `../src/parse_genbank.py`
+    "../src/parse_genbank.py"
     all_spp = Set.new
     File.open("genbank_raw_names.txt", "r") do |file|
       file.each_with_index do |line, i|
@@ -235,8 +235,8 @@ task :analysis_setup do
 end
 
 # Getting Things Done
-file 'figures/multi_gam.png' do `Rscript -e "source('R/install.R)'; run_gam_df()"` end
-file 'figures/order_phy.pdf' do `Rscript -e "source('R/install.R)'; makephylo()"` end
+file 'figures/multi_gam.png' do `Rscript -e "source('R/install.R'); run_gam_df()"` end
+file 'figures/order_phy.pdf' do `Rscript -e "source('R/install.R'); makephylo()"` end
 file 'figures/multi_gam.png' do `Rscript -e "source('R/install.R'); multi_gam()"` end
 file 'tables/two_and_three_way_comparisons.tex' do `Rscript -e "source(R/install.R); write_overlap_table(overlap_data)"` end
 file 'tables/all_families_ranking.csv' do `Rscript -e "source('R/install.R'); do_big_list_family_anlysis()")` end
