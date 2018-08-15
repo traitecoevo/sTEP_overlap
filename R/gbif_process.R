@@ -36,13 +36,11 @@ get_gbif_names<-function(){
 }
 
 get_gbif<-function(){
-  a <- fread("clean_data/gbif_tpl_locations.csv")
-  names(a)<-c("species","lat","long")
+  a <- read_csv("raw_data/gbif_clean.csv")
   read_csv("raw_data/tpl_names.txt")%>%
-    dplyr::select(correct.names)%>%
-    mutate(correct.names=tolower(gsub("_", " ", correct.names)))->goodNames
-    accNames<-unique(goodNames$correct.names)
-  b<-filter(a,species%in%accNames) 
+    filter(status=="Accepted")->acc_names
+    correct.names <-tolower(gsub("_", " ", unique(acc_names$gs)))
+   b<-filter(a,species%in% correct.names) 
 
   return(b)
 }
