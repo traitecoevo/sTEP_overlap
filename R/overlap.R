@@ -35,10 +35,6 @@
 #tree.names<-scrub(tree$tip.label)
 #tree.names<-use.synonym.lookup(tree.names)
 
-get_gbif_names<-function(){
-  a<-get_gbif()
-  return(unique(a$species))
-}
 
 
 #thanks to peeps on stackoverflow
@@ -51,12 +47,19 @@ calculate.overlap <- function(y, i){
   return(do.call(c, pw))
 }
 
-
-
+read.in.try<-function(){
+   try_sp<-read.csv("clean_data/try_spp_clean.txt", header=FALSE, as.is=TRUE)[,1]
+    read_csv("raw_data/tpl_names.txt")%>%
+    filter(status=="Accepted")->acc_names
+    correct.names <-tolower(gsub("_", " ", unique(acc_names$gs)))
+   b<-try_sp[try_sp%in% correct.names]
+   return(b)
+   }
 
 do_overlap_analysis<-function(){
-  lookup <- read_csv("raw_data/tpl_names.txt")
-  tpl_names <- unique(sub("_"," ",lookup$correct.names))
+  read_csv("raw_data/tpl_names.txt")%>%
+  filter(status=="Accepted") ->lookup
+    tpl_names <- tolower(unique(sub("_"," ",lookup$gs)))
   gbif<-get_gbif_names()
   try_names<-read.in.try()
   y<-list(

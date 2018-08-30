@@ -73,11 +73,7 @@ make_well_known_treemap<-function(y){
   dev.off()
   
 }
-# You don't need to clean/downcase this now
-read.in.try<-function(){
-try_sp<-read.csv("clean_data/try_spp_clean.txt", header=FALSE, as.is=TRUE)[,1]
-return(tolower(t_try))
-}
+
 
 makephylo<-function(){
   t_try<-read.csv("clean_data/try_spp_clean.txt", header=FALSE, as.is=TRUE)[,1]

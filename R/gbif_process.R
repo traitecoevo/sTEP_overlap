@@ -1,8 +1,3 @@
-# Libraries
-library(sp)
-library(maptools)
-library(raster)
-
 get_cont_raster<-function(){
   cont.shp <- readShapeSpatial("raw_data/continent.shp")
   worldclim<-raster::getData('worldclim', var='tmin', res=2.5)
@@ -12,36 +7,25 @@ get_cont_raster<-function(){
   writeRaster(cont.raster,"clean_data/cont2.5.grd")
 }
 
-gbif_tpl<-function(gbif){
-  syns<-fread("raw_data/tpl_names.txt")
-  syns$correct.names<-sub("_"," ",syns$correct.names)
-  syns$all.names<-sub("_"," ",syns$all.names)
-  gbif$corrected.name<-syns$correct.names[match(gbif$species,syns$all.names)]
-  gbif<-filter(gbif,!is.na(corrected.name))
-  gbif<-select(gbif,species=corrected.name,lat=decimalLatitude,long=decimalLongitude)
-  return(gbif)
-}
-
 
 get_gbif_names<-function(){
-  a <- fread("clean_data/gbif_spp.txt")
-  names(a)<-c("species","lat","long")
-  read_csv("raw_data/tpl_names.txt")%>%
-    dplyr::select(correct.names)%>%
-    mutate(correct.names=tolower(gsub("_", " ", correct.names)))->goodNames
-    accNames<-unique(goodNames$correct.names)
-  b<-filter(a,species%in%accNames) 
-
-  return(b)
+  a <- read_csv("raw_data/gbif_clean.csv")
+  a$species<-tolower(a$binomial)
+   read_csv("raw_data/tpl_names.txt")%>%
+    filter(status=="Accepted")->acc_names
+    correct.names <-tolower(gsub("_", " ", unique(acc_names$gs)))
+  b<-filter(a,species%in%correct.names) 
+  return(unique(b$species))
 }
 
 get_gbif<-function(){
-  a <- read_csv("raw_data/gbif_clean.csv")
+  a <- read_csv("raw_data/gbif_clean.csv") %>%
+  rename(lat=decimallatitude,long=decimallongitude)
+  a$species<-tolower(a$binomial)
   read_csv("raw_data/tpl_names.txt")%>%
     filter(status=="Accepted")->acc_names
     correct.names <-tolower(gsub("_", " ", unique(acc_names$gs)))
-   b<-filter(a,species%in% correct.names) 
-
+   b<-filter(a, species %in% correct.names) 
   return(b)
 }
 
@@ -49,7 +33,11 @@ get_genbank<-function(){
   genbank<-read.csv("clean_data/genbank_spp_clean.txt",header=FALSE,as.is=TRUE)
   genbank.scrubbed<-tolower(genbank$V1)
   out<-genbank.scrubbed[!is.na(genbank.scrubbed)]
-  return(out)
+    read_csv("raw_data/tpl_names.txt")%>%
+    filter(status=="Accepted")->acc_names
+    correct.names <-tolower(gsub("_", " ", unique(acc_names$gs)))
+   b<-genbank.scrubbed[genbank.scrubbed%in% correct.names]
+  return(b)
 }
 
 make_sampling_map<-function(a){
@@ -79,7 +67,8 @@ do.gam.analysis<-function(b,type){
   b$try.genbank.yes.no<-b$species%in%tolower(try_sp)&
                         b$species%in%genbank.scrubbed
  
-   gam_try_plus_genbank<-bam(try.genbank.yes.no~s(lat),family=binomial(),data=b,cluster=ou,gc.level=2)
+   gam_try_plus_genbank<-bam(try.genbank.yes.no~s(lat),family=binomial(),
+   data=b,cluster=ou,gc.level=2)
  
   gam.df<-data.frame(lat=c(b$lat,b$lat,b$lat),
                     fit=c(fitted(out_try),
@@ -131,7 +120,7 @@ run_gam_df<-function(){
   a<-get_gbif()
   
   #random subsample
-  random.obs<-a[sample(1:dim(a)[1],2*10^7,replace=F),]
+  random.obs<-a[sample(1:dim(a)[1],1*10^7,replace=F),]
   
   #species median dataset
   by.species<-summarize(group_by(a,species),lat=median(lat))
@@ -144,14 +133,41 @@ run_gam_df<-function(){
   gam.df.obs<-do.gam.analysis(random.obs,type="by gbif observation")
   gam.df.sp<-do.gam.analysis(by.species,type="by species")
  
+
   #stick data frame together
   out<-rbind(gam.df.obs,gam.df.sp)
+  out<-filter(out,abs(lat)<65)
   ss<-out[sample(1:dim(out)[1],1*10^6,replace=F),]
-  ggplot(ss,aes(x=lat,y=fit))+
+  ss$lat_cut<-cut(ss$lat, seq(-65,65,0.5))
+  ss %>% group_by(lat_cut) %>% summarize(sampleSize = n())->ss2
+  ss %>%left_join(ss2,by="lat_cut")->ss
+    write_csv(ss,"plotting_gam.csv")
+    ss %>% filter(type=="by gbif observation") %>%
+    ggplot(aes(x=lat,y=fit))+
           ylab("Proportion in database")+
-          geom_line(aes(col=dataset,linetype=type))+
+          geom_line(aes(col=dataset,size=sampleSize))+ #linetype=type,
         theme_classic()
   ggsave("figures/multi_gam.png",width=8.5,height=5)
+  
+  
+      ss %>% filter(type=="by species") %>%
+    ggplot(aes(x=lat,y=fit))+
+          ylab("Proportion in database")+
+          geom_line(aes(col=dataset,size=sampleSize))+ #linetype=type,
+        theme_classic()
+  ggsave("figures/multi_gam_by_species.png",width=8.5,height=5)
+  
+  
+  ss %>% 
+  mutate(dataset=recode(dataset,  "genbank_plus_try"="Genbank and TRY","genbank"="Genbank"))%>%
+    ggplot(aes(x=lat,y=fit,col=dataset,size=sampleSize))+
+          ylab("Proportion in database")+
+          geom_line(alpha=0.75)+ #linetype=type,
+        theme_classic()+facet_grid(~type)+xlab("Latitude")
+  ggsave("figures/multi_gam_final.pdf",width=8.5,height=5)
+  
+  
+  # ->tt
 }
 
 plot_gbif_bins<-function(out){
